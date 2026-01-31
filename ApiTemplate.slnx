@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Src/">
+    <Project Path="Src/ApiTemplate.AppHost/ApiTemplate.AppHost.csproj" />
+    <Project Path="Src/ApiTemplate.Application/ApiTemplate.Application.csproj" Id="eee623e0-6cce-4132-aed0-575632f0bd3c" />
+    <Project Path="Src/ApiTemplate.Infrastructure/ApiTemplate.Infrastructure.csproj" />
+    <Project Path="Src/ApiTemplate.Api/ApiTemplate.Api.csproj" />
+  </Folder>
+</Solution>
