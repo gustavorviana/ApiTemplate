@@ -1,8 +1,11 @@
+using ApiTemplate.Api.DependencyInjection;
 using ApiTemplate.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+builder.AddServiceDefaults()
+    .ConfigureOpenTelemetry()
+    .AddDefaultHealthChecks();
 
 // Add services to the container.
 

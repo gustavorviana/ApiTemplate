@@ -12,8 +12,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ApiTemplate.Application\ApiTemplate.Application.csproj" />
-	  <ProjectReference Include="..\ApiTemplate.Infrastructure\ApiTemplate.Infrastructure.csproj" />
+		<ProjectReference Include="..\ApiTemplate.Application\ApiTemplate.Application.csproj" />
+		<ProjectReference Include="..\ApiTemplate.Infrastructure\ApiTemplate.Infrastructure.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
+		<PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Middlewares\" />
+		<Folder Include="Filters\" />
 	</ItemGroup>
 
 </Project>
