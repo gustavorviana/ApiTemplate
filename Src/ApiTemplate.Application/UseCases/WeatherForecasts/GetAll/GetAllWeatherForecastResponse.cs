@@ -1,6 +1,6 @@
-namespace ApiTemplate.Application.Models.Responses;
+namespace ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
 
-public class WeatherForecast
+public class GetAllWeatherForecastResponse
 {
     public DateOnly Date { get; set; }
 

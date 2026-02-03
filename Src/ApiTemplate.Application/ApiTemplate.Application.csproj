@@ -9,9 +9,9 @@
   <ItemGroup>
     <Folder Include="Core\Entities\" />
     <Folder Include="Core\Events\" />
+    <Folder Include="Core\Enums\" />
     <Folder Include="Core\ValueObjects\" />
     <Folder Include="Interfaces\" />
-    <Folder Include="Models\Requests\" />
     <Folder Include="Validation\" />
   </ItemGroup>
 
