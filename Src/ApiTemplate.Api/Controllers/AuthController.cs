@@ -1,13 +1,7 @@
-﻿using ApiTemplate.Application.Core.Entities;
-using ApiTemplate.Application.UseCases.Auth;
+﻿using ApiTemplate.Application.UseCases.Auth;
 using ApiTemplate.Application.UseCases.Auth.Login;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using ApiTemplate.Application.UseCases.Auth.Refresh;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
 
 namespace ApiTemplate.Api.Controllers
 {
@@ -19,11 +13,8 @@ namespace ApiTemplate.Api.Controllers
         public Task<AuthResponse> Login([FromBody] AuthRequest request, CancellationToken cancellationToken)
             => new LoginHandle(configuration).ExecuteAsync(request, cancellationToken);
 
-        [Authorize]
-        [HttpGet()]
-        public IActionResult AuthenticationOnlyEndpoint()
-        {
-            return Ok("You Are Authenticated");
-        }
+        [HttpPost("refresh-token")]
+        public Task<AuthResponse> RefreshToken([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+            => new RefreshTokenHandle(configuration).ExecuteAsync(request, cancellationToken);
     }
 }
