@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 
 namespace ApiTemplate.Application.Results;
 
@@ -8,7 +8,7 @@ namespace ApiTemplate.Application.Results;
 /// Spec: RFC 9457 - Problem Details for HTTP APIs
 /// https://datatracker.ietf.org/doc/html/rfc9457
 /// </summary>
-public sealed class ProblemResult : IResult
+public sealed class ProblemResult
 {
     /// <summary>RFC 9457: problem type URI.</summary>
     public string Type { get; }
