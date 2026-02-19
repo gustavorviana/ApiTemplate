@@ -15,6 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Src\ApiTemplate.Api\ApiTemplate.Api.csproj" />
 		<ProjectReference Include="..\Src\ApiTemplate.Application\ApiTemplate.Application.csproj" />
 	</ItemGroup>
 
