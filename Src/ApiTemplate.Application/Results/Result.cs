@@ -1,16 +1,19 @@
+using System.Text.Json.Serialization;
+
 namespace ApiTemplate.Application.Results;
 
-public record Result(int Status, ProblemResult? Problem = null) : IResult;
-
-public record Result<T>(int Status, T? Data, ProblemResult? Problem = null) : Result(Status, Problem), IResult<T>
+public class Result(int status, ProblemResult? problem = null) : IResult
 {
-    public static implicit operator Result<T>(T data)
-    {
-        return new Result<T>(200, data);
-    }
+    public int Status => status;
+    [JsonIgnore]
+    public ProblemResult? Problem => problem;
+}
 
-    public static implicit operator Result<T>(ProblemResult problem)
-    {
-        return new Result<T>(problem.Status, default, problem);
-    }
+public class Result<T>(int status, T? data, ProblemResult? problem = null) : Result(status, problem), IResult<T>
+{
+    public T? Data => data;
+
+    public static implicit operator Result<T>(T data) => new(200, data);
+
+    public static implicit operator Result<T>(ProblemResult problem) => new(problem.Status, default, problem);
 }

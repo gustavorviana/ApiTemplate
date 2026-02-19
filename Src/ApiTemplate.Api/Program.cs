@@ -1,4 +1,5 @@
 using ApiTemplate.Api.DependencyInjection;
+using ApiTemplate.Api.Filters;
 using ApiTemplate.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,10 @@ builder.AddServiceDefaults()
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+	options.Filters.Add<ResultToProblemResultFilter>();
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

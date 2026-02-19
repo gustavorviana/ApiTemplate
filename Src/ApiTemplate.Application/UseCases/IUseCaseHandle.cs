@@ -1,6 +1,8 @@
-﻿namespace ApiTemplate.Application.UseCases;
+﻿using ApiTemplate.Application.Results;
 
-public interface IUseCaseHandle<in TRequest, TResponse>
+namespace ApiTemplate.Application.UseCases;
+
+public interface IUseCaseHandle<in TRequest, TResponse> where TResponse : IResult
 {
     Task<TResponse> ExecuteAsync(TRequest request, CancellationToken cancellationToken = default);
 }
