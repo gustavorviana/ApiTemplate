@@ -8,31 +8,23 @@ namespace ApiTemplate.Application.Results;
 /// Spec: RFC 9457 - Problem Details for HTTP APIs
 /// https://datatracker.ietf.org/doc/html/rfc9457
 /// </summary>
-public sealed class ProblemResult
+public sealed class ProblemResult(
+    int status,
+    string title,
+    string type = "about:blank",
+    IReadOnlyDictionary<string, object?>? extensions = null)
 {
     /// <summary>RFC 9457: problem type URI.</summary>
-    public string Type { get; }
+    public string Type { get; } = string.IsNullOrWhiteSpace(type) ? "about:blank" : type;
 
     /// <summary>RFC 9457: short, human-readable summary of the problem type.</summary>
-    public string Title { get; }
+    public string Title { get; } = string.IsNullOrWhiteSpace(title) ? "Error" : title;
 
     /// <summary>RFC 9457: HTTP status code.</summary>
-    public int Status { get; }
+    public int Status => status;
 
     /// <summary>RFC 9457 extension members.</summary>
-    public IReadOnlyDictionary<string, object?> Extensions { get; }
-
-    public ProblemResult(
-        int status,
-        string type,
-        string title,
-        IReadOnlyDictionary<string, object?>? extensions = null)
-    {
-        Status = status;
-        Type = string.IsNullOrWhiteSpace(type) ? "about:blank" : type;
-        Title = string.IsNullOrWhiteSpace(title) ? "Error" : title;
-        Extensions = NormalizeExtensions(extensions);
-    }
+    public IReadOnlyDictionary<string, object?> Extensions { get; } = NormalizeExtensions(extensions);
 
     private static IReadOnlyDictionary<string, object?> NormalizeExtensions(IReadOnlyDictionary<string, object?>? extensions)
     {

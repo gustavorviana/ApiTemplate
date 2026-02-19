@@ -8,4 +8,7 @@
     <Project Path="Src/ApiTemplate.Infrastructure/ApiTemplate.Infrastructure.csproj" />
     <Project Path="Src/ApiTemplate.Api/ApiTemplate.Api.csproj" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="ApiTemplate.Tests/ApiTemplate.Tests.csproj" Id="9e1aec43-232c-44f3-8c0d-5721a1fd81e5" />
+  </Folder>
 </Solution>
