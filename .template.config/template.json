@@ -101,8 +101,7 @@
         {
           "condition": "(!UseDatabase)",
           "exclude": [
-            "Src/ApiTemplate.Application/Core/Entities",
-            "Src/ApiTemplate.Application/Core/Entities/**",
+            "Src/ApiTemplate.Application/Core/Entities/User.cs",
             "Src/ApiTemplate.Application/Interfaces/IDbContext.cs",
             "Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
             "Src/ApiTemplate.Infrastructure/Data",

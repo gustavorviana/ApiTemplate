@@ -5,6 +5,9 @@ using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Infrastructure.Data;
 using ApiTemplate.Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+#else
+using ApiTemplate.Application.Interfaces;
+using ApiTemplate.Infrastructure.Fakes;
 #endif
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,6 +42,8 @@ public static class ApiServiceCollectionExtensions
 
 #if (UseDatabase)
         builder.Services.AddDatabase(builder.Configuration.GetConnectionString("DefaultConnection")!);
+#else
+        builder.Services.AddScoped<IWeatherForecastRepository, FakeWeatherForecastRepository>();
 #endif
 
         return builder;
@@ -60,6 +65,7 @@ public static class ApiServiceCollectionExtensions
 
         services.AddScoped<IDbContext>(sp => sp.GetRequiredService<AppDbContext>());
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IWeatherForecastRepository, WeatherForecastRepository>();
 
         return services;
     }

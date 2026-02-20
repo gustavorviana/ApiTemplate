@@ -1,6 +1,7 @@
 #if (EnableResult)
 using ApiTemplate.Application.Results;
 #endif
+using ApiTemplate.Application.Interfaces;
 
 namespace ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
 
@@ -10,22 +11,31 @@ public class GetAllWeatherForecastHandle : IUseCaseHandle<GetAllWeatherForecastR
 public class GetAllWeatherForecastHandle : IUseCaseHandle<GetAllWeatherForecastRequest, List<GetAllWeatherForecastResponse>>
 #endif
 {
-    private static readonly string[] Summaries =
-        [
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        ];
+    private readonly IWeatherForecastRepository _repository;
+
+    public GetAllWeatherForecastHandle(IWeatherForecastRepository repository)
+    {
+        _repository = repository;
+    }
+
 #if (EnableResult)
     public async Task<ListResult<GetAllWeatherForecastResponse>> ExecuteAsync(GetAllWeatherForecastRequest request, CancellationToken cancellationToken = default)
 #else
     public async Task<List<GetAllWeatherForecastResponse>> ExecuteAsync(GetAllWeatherForecastRequest request, CancellationToken cancellationToken = default)
 #endif
     {
-        await Task.CompletedTask;
-        return Enumerable.Range(1, 5).Select(index => new GetAllWeatherForecastResponse
+        var list = await _repository.GetAllAsync(cancellationToken);
+        var data = list.Select(e => new GetAllWeatherForecastResponse
         {
-            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            Id = e.Id,
+            Date = e.Date,
+            TemperatureC = e.TemperatureC,
+            Summary = e.Summary
         }).ToList();
+#if (EnableResult)
+        return new ListResult<GetAllWeatherForecastResponse>(data);
+#else
+        return data;
+#endif
     }
 }

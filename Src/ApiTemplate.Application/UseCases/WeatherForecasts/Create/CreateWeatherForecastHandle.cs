@@ -1,6 +1,8 @@
 #if (EnableResult)
 using ApiTemplate.Application.Results;
 #endif
+using ApiTemplate.Application.Core.Entities;
+using ApiTemplate.Application.Interfaces;
 
 namespace ApiTemplate.Application.UseCases.WeatherForecasts.Create;
 
@@ -10,31 +12,35 @@ public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastR
 public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastRequest, CreateWeatherForecastResponse>
 #endif
 {
+    private readonly IWeatherForecastRepository _repository;
+
+    public CreateWeatherForecastHandle(IWeatherForecastRepository repository)
+    {
+        _repository = repository;
+    }
 
 #if (EnableResult)
     public async Task<Result<CreateWeatherForecastResponse>> ExecuteAsync(
 #else
     public async Task<CreateWeatherForecastResponse> ExecuteAsync(
-
 #endif
-    CreateWeatherForecastRequest request,
+        CreateWeatherForecastRequest request,
         CancellationToken cancellationToken = default)
     {
-        await Task.CompletedTask;
-
+        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+        var entity = WeatherForecast.Create(date, request.TemperatureC, request.Summary);
+        var added = await _repository.AddAsync(entity, cancellationToken);
         var response = new CreateWeatherForecastResponse
         {
-            Id = Random.Shared.Next(1, 10_000),
-            Date = DateOnly.FromDateTime(DateTime.UtcNow),
-            TemperatureC = request.TemperatureC,
-            Summary = request.Summary
+            Id = added.Id,
+            Date = added.Date,
+            TemperatureC = added.TemperatureC,
+            Summary = added.Summary
         };
-
 #if (EnableResult)
         return new Result<CreateWeatherForecastResponse>(201, response);
 #else
         return response;
 #endif
-
     }
 }

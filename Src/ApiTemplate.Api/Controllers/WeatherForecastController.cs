@@ -1,4 +1,5 @@
 using ApiTemplate.Application.UseCases.WeatherForecasts.Create;
+using ApiTemplate.Application.UseCases.WeatherForecasts.Delete;
 using ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
 using Microsoft.AspNetCore.Mvc;
 #if (EnableResult)
@@ -31,4 +32,22 @@ public class WeatherForecastController : ControllerBase
         [FromBody] CreateWeatherForecastRequest request,
         CancellationToken token)
         => await handle.ExecuteAsync(request, token);
+
+    [HttpDelete("{id:int}", Name = "DeleteWeatherForecast")]
+#if (EnableResult)
+    public async Task<IResult> Delete(
+        [FromServices] DeleteWeatherForecastHandle handle,
+        [FromRoute] int id,
+        CancellationToken token)
+        => await handle.ExecuteAsync(new DeleteWeatherForecastRequest { Id = id }, token);
+#else
+    public async Task<IActionResult> Delete(
+        [FromServices] DeleteWeatherForecastHandle handle,
+        [FromRoute] int id,
+        CancellationToken token)
+    {
+        var deleted = await handle.ExecuteAsync(new DeleteWeatherForecastRequest { Id = id }, token);
+        return deleted ? NoContent() : NotFound();
+    }
+#endif
 }
