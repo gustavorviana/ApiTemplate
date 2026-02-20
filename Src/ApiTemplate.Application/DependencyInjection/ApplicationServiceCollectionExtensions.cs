@@ -1,4 +1,4 @@
-﻿using ApiTemplate.Application.UseCases;
+using ApiTemplate.Application.UseCases;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -9,7 +9,6 @@ public static class ApplicationServiceCollectionExtensions
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         RegisterUseCases(services);
-        // services.AddValidatorsFromAssembly(...);
         return services;
     }
 

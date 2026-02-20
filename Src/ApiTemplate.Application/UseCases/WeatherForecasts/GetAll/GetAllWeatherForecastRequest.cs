@@ -1,3 +1,3 @@
-﻿namespace ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
+namespace ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
 
 public class GetAllWeatherForecastRequest;

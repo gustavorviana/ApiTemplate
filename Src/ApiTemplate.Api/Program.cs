@@ -1,5 +1,6 @@
 using ApiTemplate.Api.DependencyInjection;
 using ApiTemplate.Api.Filters;
+using ApiTemplate.Api.Serialization;
 using ApiTemplate.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,12 @@ builder.AddServiceDefaults()
 
 builder.Services.AddControllers(options =>
 {
+	options.Filters.Add<ValidationActionFilter>();
 	options.Filters.Add<ResultToProblemResultFilter>();
+})
+.AddJsonOptions(json =>
+{
+	json.JsonSerializerOptions.Converters.Add(new ProblemResultJsonConverter());
 });
 
 builder.Services.AddEndpointsApiExplorer();
