@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "author": "",
+  "classifications": [
+    "Web",
+    "API",
+    "Clean Architecture"
+  ],
+  "identity": "Viana.Api",
+  "name": "Viana.Api",
+  "shortName": "viana-api",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "preferNameDirectory": true,
+  "symbols": {
+    "UseResult": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Includes the Result pattern (Result, ProblemResult, ListResult, PagedResult)"
+    },
+    "UseValidation": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Includes FluentValidation support. When enabled, the Result pattern is also required and will be included automatically."
+    },
+    "EnableResult": {
+      "type": "computed",
+      "value": "(UseResult || UseValidation)"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!EnableResult)",
+          "exclude": [
+            "Src/ApiTemplate.Application/Results/**",
+            "Src/ApiTemplate.Api/Filters/ResultToProblemResultFilter.cs",
+            "Src/ApiTemplate.Api/Serialization/**",
+            "ApiTemplate.Tests/Results/**",
+            "ApiTemplate.Tests/Filters/ResultToProblemResultFilterTests.cs"
+          ]
+        },
+        {
+          "condition": "(!UseValidation)",
+          "exclude": [
+            "Src/ApiTemplate.Application/Validation/**",
+            "Src/ApiTemplate.Api/Filters/ValidationActionFilter.cs",
+            "Src/ApiTemplate.Application/UseCases/WeatherForecasts/Create/CreateWeatherForecastRequestValidator.cs",
+            "ApiTemplate.Tests/Filters/ValidationActionFilterTests.cs"
+          ]
+        }
+      ]
+    }
+  ]
+}

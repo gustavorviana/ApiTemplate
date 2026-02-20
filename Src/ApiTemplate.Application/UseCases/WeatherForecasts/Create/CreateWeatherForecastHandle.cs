@@ -1,11 +1,23 @@
-﻿using ApiTemplate.Application.Results;
+#if (EnableResult)
+using ApiTemplate.Application.Results;
+#endif
 
 namespace ApiTemplate.Application.UseCases.WeatherForecasts.Create;
 
+#if (EnableResult)
 public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastRequest, Result<CreateWeatherForecastResponse>>
+#else
+public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastRequest, CreateWeatherForecastResponse>
+#endif
 {
+
+#if (EnableResult)
     public async Task<Result<CreateWeatherForecastResponse>> ExecuteAsync(
-        CreateWeatherForecastRequest request,
+#else
+    public async Task<CreateWeatherForecastResponse> ExecuteAsync(
+
+#endif
+    CreateWeatherForecastRequest request,
         CancellationToken cancellationToken = default)
     {
         await Task.CompletedTask;
@@ -18,6 +30,11 @@ public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastR
             Summary = request.Summary
         };
 
+#if (EnableResult)
         return new Result<CreateWeatherForecastResponse>(201, response);
+#else
+        return response;
+#endif
+
     }
 }

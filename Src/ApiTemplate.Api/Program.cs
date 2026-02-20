@@ -1,6 +1,8 @@
 using ApiTemplate.Api.DependencyInjection;
+#if (EnableResult)
 using ApiTemplate.Api.Filters;
 using ApiTemplate.Api.Serialization;
+#endif
 using ApiTemplate.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,17 +11,21 @@ builder.AddServiceDefaults()
     .ConfigureOpenTelemetry()
     .AddDefaultHealthChecks();
 
-// Add services to the container.
-
+#if (EnableResult)
 builder.Services.AddControllers(options =>
 {
+#if (UseValidation)
 	options.Filters.Add<ValidationActionFilter>();
-	options.Filters.Add<ResultToProblemResultFilter>();
+#endif
+    options.Filters.Add<ResultToProblemResultFilter>();
 })
 .AddJsonOptions(json =>
 {
 	json.JsonSerializerOptions.Converters.Add(new ProblemResultJsonConverter());
 });
+#else
+builder.Services.AddControllers();
+#endif
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -28,7 +34,6 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
