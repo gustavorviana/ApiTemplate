@@ -9,6 +9,7 @@
   "identity": "Viana.Api",
   "name": "Viana.Api",
   "shortName": "viana-api",
+  "sourceName": "ApiTemplate",
   "tags": {
     "language": "C#",
     "type": "solution"
@@ -105,10 +106,10 @@
         },
         {
           "exclude": [
-            ".git",
-            ".github",
+            ".git/**",
+            ".vs/**",
+            ".github/**",
             ".gitattributes",
-            ".gitignore",
             "LICENSE.txt"
           ]
         }
