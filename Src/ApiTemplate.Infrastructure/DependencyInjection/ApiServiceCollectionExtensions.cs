@@ -1,4 +1,11 @@
 using ApiTemplate.Application.DependencyInjection;
+#if (UseDatabase)
+using Microsoft.Extensions.Configuration;
+using ApiTemplate.Application.Interfaces;
+using ApiTemplate.Infrastructure.Data;
+using ApiTemplate.Infrastructure.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
+#endif
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -30,6 +37,31 @@ public static class ApiServiceCollectionExtensions
         //     options.AllowedSchemes = ["https"];
         // });
 
+#if (UseDatabase)
+        builder.Services.AddDatabase(builder.Configuration.GetConnectionString("DefaultConnection")!);
+#endif
+
         return builder;
     }
+
+#if (UseDatabase)
+    private static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
+    {
+        services.AddDbContext<AppDbContext>(options =>
+        {
+#if (UseSqlServer)
+            options.UseSqlServer(connectionString);
+#elif (UsePostgres)
+            options.UseNpgsql(connectionString);
+#elif (UseMySQL)
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+#endif
+        });
+
+        services.AddScoped<IDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+        services.AddScoped<IUserRepository, UserRepository>();
+
+        return services;
+    }
+#endif
 }

@@ -30,6 +30,46 @@
     "EnableResult": {
       "type": "computed",
       "value": "(UseResult || UseValidation)"
+    },
+    "DatabaseProvider": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "none",
+      "description": "The database provider to use with Entity Framework Core.",
+      "choices": [
+        {
+          "choice": "sqlserver",
+          "description": "SQL Server (Microsoft.EntityFrameworkCore.SqlServer)"
+        },
+        {
+          "choice": "postgres",
+          "description": "PostgreSQL (Npgsql.EntityFrameworkCore.PostgreSQL)"
+        },
+        {
+          "choice": "mysql",
+          "description": "MySQL (Pomelo.EntityFrameworkCore.MySql)"
+        },
+        {
+          "choice": "none",
+          "description": "No database configured"
+        }
+      ]
+    },
+    "UseSqlServer": {
+      "type": "computed",
+      "value": "(DatabaseProvider == \"sqlserver\")"
+    },
+    "UsePostgres": {
+      "type": "computed",
+      "value": "(DatabaseProvider == \"postgres\")"
+    },
+    "UseMySQL": {
+      "type": "computed",
+      "value": "(DatabaseProvider == \"mysql\")"
+    },
+    "UseDatabase": {
+      "type": "computed",
+      "value": "(DatabaseProvider != \"none\")"
     }
   },
   "sources": [
@@ -52,6 +92,24 @@
             "Src/ApiTemplate.Api/Filters/ValidationActionFilter.cs",
             "Src/ApiTemplate.Application/UseCases/WeatherForecasts/Create/CreateWeatherForecastRequestValidator.cs",
             "ApiTemplate.Tests/Filters/ValidationActionFilterTests.cs"
+          ]
+        },
+        {
+          "condition": "(!UseDatabase)",
+          "exclude": [
+            "Src/ApiTemplate.Application/Core/Entities/**",
+            "Src/ApiTemplate.Application/Interfaces/IDbContext.cs",
+            "Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
+            "Src/ApiTemplate.Infrastructure/Data/**"
+          ]
+        },
+        {
+          "exclude": [
+            ".git",
+            ".github",
+            ".gitattributes",
+            ".gitignore",
+            "LICENSE.txt"
           ]
         }
       ]

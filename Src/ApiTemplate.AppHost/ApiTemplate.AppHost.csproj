@@ -13,6 +13,21 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" />
   </ItemGroup>
+<!--#if (UseSqlServer) -->
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.SqlServer" />
+  </ItemGroup>
+<!--#endif -->
+<!--#if (UsePostgres) -->
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+  </ItemGroup>
+<!--#endif -->
+<!--#if (UseMySQL) -->
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.MySql" />
+  </ItemGroup>
+<!--#endif -->
 
   <ItemGroup>
     <ProjectReference Include="..\ApiTemplate.Api\ApiTemplate.Api.csproj" />
