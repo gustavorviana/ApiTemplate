@@ -79,9 +79,12 @@
         {
           "condition": "(!EnableResult)",
           "exclude": [
+            "Src/ApiTemplate.Application/Results",
             "Src/ApiTemplate.Application/Results/**",
             "Src/ApiTemplate.Api/Filters/ResultToProblemResultFilter.cs",
+            "Src/ApiTemplate.Api/Serialization",
             "Src/ApiTemplate.Api/Serialization/**",
+            "ApiTemplate.Tests/Results",
             "ApiTemplate.Tests/Results/**",
             "ApiTemplate.Tests/Filters/ResultToProblemResultFilterTests.cs"
           ]
@@ -98,9 +101,11 @@
         {
           "condition": "(!UseDatabase)",
           "exclude": [
+            "Src/ApiTemplate.Application/Core/Entities",
             "Src/ApiTemplate.Application/Core/Entities/**",
             "Src/ApiTemplate.Application/Interfaces/IDbContext.cs",
             "Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
+            "Src/ApiTemplate.Infrastructure/Data",
             "Src/ApiTemplate.Infrastructure/Data/**"
           ]
         },

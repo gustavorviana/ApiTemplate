@@ -33,7 +33,7 @@ public class ResultToProblemResultFilterTests
 		Result<string> result = problem;
 		var objectResult = new ObjectResult(result);
 		var context = CreateContext(objectResult);
-		var filter = new ResultToProblemResultFilter();
+		var filter = new ApplicationResultFilter();
 
 		filter.OnResultExecuting(context);
 
@@ -48,7 +48,7 @@ public class ResultToProblemResultFilterTests
 		var result = new Result(204);
 		var objectResult = new ObjectResult(result);
 		var context = CreateContext(objectResult);
-		var filter = new ResultToProblemResultFilter();
+		var filter = new ApplicationResultFilter();
 
 		filter.OnResultExecuting(context);
 
@@ -62,7 +62,7 @@ public class ResultToProblemResultFilterTests
 		Result<string> result = "ok";
 		var objectResult = new ObjectResult(result);
 		var context = CreateContext(objectResult);
-		var filter = new ResultToProblemResultFilter();
+		var filter = new ApplicationResultFilter();
 
 		filter.OnResultExecuting(context);
 
@@ -76,7 +76,7 @@ public class ResultToProblemResultFilterTests
 		var result = new Result<string>(204, null);
 		var objectResult = new ObjectResult(result);
 		var context = CreateContext(objectResult);
-		var filter = new ResultToProblemResultFilter();
+		var filter = new ApplicationResultFilter();
 
 		filter.OnResultExecuting(context);
 
@@ -89,7 +89,7 @@ public class ResultToProblemResultFilterTests
 	{
 		var statusResult = new StatusCodeResult(200);
 		var context = CreateContext(statusResult);
-		var filter = new ResultToProblemResultFilter();
+		var filter = new ApplicationResultFilter();
 
 		filter.OnResultExecuting(context);
 
@@ -101,7 +101,7 @@ public class ResultToProblemResultFilterTests
 	{
 		var objectResult = new ObjectResult("plain string");
 		var context = CreateContext(objectResult);
-		var filter = new ResultToProblemResultFilter();
+		var filter = new ApplicationResultFilter();
 
 		filter.OnResultExecuting(context);
 

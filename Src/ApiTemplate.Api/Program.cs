@@ -17,7 +17,7 @@ builder.Services.AddControllers(options =>
 #if (UseValidation)
 	options.Filters.Add<ValidationActionFilter>();
 #endif
-    options.Filters.Add<ResultToProblemResultFilter>();
+    options.Filters.Add<ApplicationResultFilter>();
 })
 .AddJsonOptions(json =>
 {
