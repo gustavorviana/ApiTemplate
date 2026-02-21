@@ -1,4 +1,3 @@
-#if (!UseDatabase)
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 
@@ -49,4 +48,3 @@ public class FakeWeatherForecastRepository : IWeatherForecastRepository
         }
     }
 }
-#endif

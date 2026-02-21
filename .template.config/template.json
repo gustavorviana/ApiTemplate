@@ -71,6 +71,12 @@
     "UseDatabase": {
       "type": "computed",
       "value": "(DatabaseProvider != \"none\")"
+    },
+    "RunMigrationsOnStartup": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Run EF Core migrations when the application starts (only when database is enabled)."
     }
   },
   "sources": [
@@ -104,6 +110,7 @@
             "Src/ApiTemplate.Application/Core/Entities/User.cs",
             "Src/ApiTemplate.Application/Interfaces/IDbContext.cs",
             "Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
+            "Src/ApiTemplate.Infrastructure/DependencyInjection/DatabaseMigrationRunner.cs",
             "Src/ApiTemplate.Infrastructure/Data",
             "Src/ApiTemplate.Infrastructure/Data/**"
           ]

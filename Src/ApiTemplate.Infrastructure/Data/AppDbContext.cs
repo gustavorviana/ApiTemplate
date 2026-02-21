@@ -10,6 +10,7 @@ public class AppDbContext : DbContext, IDbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<WeatherForecast> WeatherForecasts => Set<WeatherForecast>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
         => modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);

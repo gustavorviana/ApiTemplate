@@ -17,6 +17,7 @@
   </ItemGroup>
 <!--#endif -->
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
 <!--#if (UseDatabase) -->

@@ -1,6 +1,7 @@
 using ApiTemplate.Application.UseCases.WeatherForecasts.Create;
 using ApiTemplate.Application.UseCases.WeatherForecasts.Delete;
 using ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 #if (EnableResult)
 using IResult = ApiTemplate.Application.Results.IResult;
@@ -22,6 +23,7 @@ public class WeatherForecastController : ControllerBase
         CancellationToken token)
         => await handle.ExecuteAsync(new GetAllWeatherForecastRequest(), token);
 
+    [Authorize]
     [HttpPost(Name = "CreateWeatherForecast")]
 #if (EnableResult)
     public async Task<IResult> Create(
@@ -33,6 +35,7 @@ public class WeatherForecastController : ControllerBase
         CancellationToken token)
         => await handle.ExecuteAsync(request, token);
 
+    [Authorize]
     [HttpDelete("{id:int}", Name = "DeleteWeatherForecast")]
 #if (EnableResult)
     public async Task<IResult> Delete(
