@@ -139,22 +139,5 @@
         }
       ]
     }
-  ],
-  "postActions": [
-    {
-      "id": "AddInitialEfCoreMigration",
-      "description": "Generate the initial EF Core migration.",
-      "condition": "UseDatabase",
-      "actionId": "E7F29F54-2F0B-4A0B-8A1F-9F4B3B6C1A2",
-      "manualInstructions": [
-        {
-          "text": "To generate the initial EF Core migration, run the following command from the solution root:"
-        },
-        {
-          "text": "dotnet ef migrations add InitialCreate --project Src/<YourProject>.Infrastructure --startup-project Src/<YourProject>.Api --output-dir Data/Migrations"
-        }
-      ],
-      "continueOnError": true
-    }
   ]
 }
