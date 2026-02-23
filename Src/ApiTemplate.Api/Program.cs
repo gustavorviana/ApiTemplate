@@ -1,4 +1,5 @@
 using ApiTemplate.Api.DependencyInjection;
+using ApiTemplate.Api.Extensions;
 using ApiTemplate.Api.Filters;
 using Viana.Results.Mvc;
 using Viana.Results.Mvc.Filters;
@@ -18,11 +19,14 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<VianaResultFilter>();
 }).AddVianaResultFilter();
 
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
 builder.Services.AddJwtAuthentication(builder.Configuration);
 #endif
 
 builder.Services.AddSwaggerDocumentation();
+#if (EnableRateLimiting)
+builder.AddCustomRateLimiting();
+#endif
 
 var app = builder.Build();
 
@@ -40,8 +44,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
 app.UseJwtAuthentication();
+#endif
+
+#if (EnableRateLimiting)
+var rateLimitingEnabled = app.Configuration
+    .GetSection("RateLimiting")
+    .GetValue<bool>("Enabled");
+
+if (rateLimitingEnabled)
+{
+	app.UseRateLimiter();
+}
 #endif
 
 app.MapControllers();

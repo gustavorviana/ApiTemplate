@@ -1,4 +1,4 @@
-#if !EnableJwt
+#if !EnableJwtWithDatabase
 using ApiTemplate.Api.Filters;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -18,7 +18,7 @@ public static class SwaggerExtensions
 		services.AddSwaggerGen(options =>
 		{
             options.AddVianaResultFilters();
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
 			ConfigureJwtForSwagger(options);
 			options.OperationFilter<UnauthorizedAndForbiddenOperationFilter>();
 #endif
@@ -27,7 +27,7 @@ public static class SwaggerExtensions
 		return services;
 	}
 
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
     /// <summary>
     /// Configures Swagger for JWT Bearer authentication (security definition and requirement).
     /// </summary>

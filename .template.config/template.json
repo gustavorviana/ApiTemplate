@@ -71,8 +71,16 @@
     "EnableJwt": {
       "type": "parameter",
       "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Enables JWT authentication (requires database).",
+      "isEnabled": "(DatabaseProvider != \"none\")",
+      "isVisible": "(DatabaseProvider != \"none\")"
+    },
+    "EnableRateLimiting": {
+      "type": "parameter",
+      "datatype": "bool",
       "defaultValue": "true",
-      "description": "Enables JWT authentication, Auth endpoints, and User/RefreshToken entities"
+      "description": "Enables rate limiting configuration and RateLimiting extensions"
     }
   },
   "sources": [
@@ -101,12 +109,7 @@
         {
           "condition": "(!EnableJwt)",
           "exclude": [
-            "Src/ApiTemplate.Api/Filters/UnauthorizedAndForbiddenOperationFilter.cs"
-          ]
-        },
-        {
-          "condition": "(!EnableJwt)",
-          "exclude": [
+            "Src/ApiTemplate.Api/Filters/UnauthorizedAndForbiddenOperationFilter.cs",
             "Src/ApiTemplate.Api/DependencyInjection/JwtExtensions.cs",
             "Src/ApiTemplate.Api/Controllers/AuthController.cs",
             "Src/ApiTemplate.Application/UseCases/Auth",
@@ -126,6 +129,13 @@
             "Src/ApiTemplate.Infrastructure/Data/Configurations/RefreshTokenConfiguration.cs",
             "Tests/ApiTemplate.Tests.Application/UseCases/Auth",
             "Tests/ApiTemplate.Tests.Application/UseCases/Auth/**"
+          ]
+        },
+        {
+          "condition": "(!EnableRateLimiting)",
+          "exclude": [
+            "Src/ApiTemplate.Api/Extensions/RateLimitingExtensions.cs",
+            "Src/ApiTemplate.Api/Configuration/RateLimitingOptions.cs"
           ]
         },
         {

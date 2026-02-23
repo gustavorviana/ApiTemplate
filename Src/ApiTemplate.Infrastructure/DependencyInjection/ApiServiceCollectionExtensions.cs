@@ -1,6 +1,6 @@
 using ApiTemplate.Application.DependencyInjection;
 using ApiTemplate.Application.Interfaces;
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
 using ApiTemplate.Application.Core.Enums;
 using ApiTemplate.Application.Core.Options;
 using ApiTemplate.Infrastructure.Auth;
@@ -40,7 +40,7 @@ public static class ApiServiceCollectionExtensions
             http.AddServiceDiscovery();
         });
 
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
         builder.Services.AddJwtServices(
             builder.Configuration,
             PasswordSecurityProviderType.Basic,
@@ -57,7 +57,7 @@ public static class ApiServiceCollectionExtensions
         builder.Services.AddDatabase(builder.Configuration.GetConnectionString("DefaultConnection")!);
 #else
         builder.Services.AddScoped<IWeatherForecastRepository, FakeWeatherForecastRepository>();
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
         builder.Services.AddScoped<IUserRepository, FakeUserRepository>();
         builder.Services.AddScoped<IRefreshTokenRepository, FakeRefreshTokenRepository>();
 #endif
@@ -66,7 +66,7 @@ public static class ApiServiceCollectionExtensions
         return builder;
     }
 
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
     private static IServiceCollection AddJwtServices(
         this IServiceCollection services,
         IConfiguration configuration,
@@ -112,7 +112,7 @@ public static class ApiServiceCollectionExtensions
         });
 
         services.AddScoped<IDbContext>(sp => sp.GetRequiredService<AppDbContext>());
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 #endif

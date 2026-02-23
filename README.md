@@ -11,7 +11,7 @@ The template is parameterized and can be customized when running `dotnet new`:
 
 - **DatabaseProvider**: `sqlserver`, `postgres`, `mysql`, or `none` (no database).
 - **UseValidation**: enables FluentValidation integration.
-- **EnableJwt**: enables JWT authentication and Auth use cases.
+- **EnableJwt**: enables JWT authentication and Auth use cases (only when database is enabled).
 
 When a database provider is selected (anything other than `none`), Entity Framework Core is configured in the Infrastructure project.
 

@@ -1,6 +1,10 @@
 using ApiTemplate.Application.UseCases.WeatherForecasts.Create;
 using ApiTemplate.Application.UseCases.WeatherForecasts.Delete;
 using ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
+#if RateLimiting
+using Microsoft.AspNetCore.RateLimiting;
+#endif
+using ApiTemplate.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Viana.Results;
@@ -17,8 +21,11 @@ public class WeatherForecastController : ControllerBase
         CancellationToken token)
         => await handle.ExecuteAsync(new GetAllWeatherForecastRequest(), token);
 
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
     [Authorize]
+#if RateLimiting
+    [EnableRateLimiting(RateLimitingExtensions.AuthenticatedPolicyName)]
+#endif
 #endif
     [HttpPost(Name = "CreateWeatherForecast")]
     public async Task<IResult<CreateWeatherForecastResponse>> Create(
@@ -27,8 +34,11 @@ public class WeatherForecastController : ControllerBase
         CancellationToken token)
         => await handle.ExecuteAsync(request, token);
 
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
     [Authorize]
+#if RateLimiting
+    [EnableRateLimiting(RateLimitingExtensions.AuthenticatedPolicyName)]
+#endif
 #endif
     [HttpDelete("{id:int}", Name = "DeleteWeatherForecast")]
     public async Task<Result> Delete(

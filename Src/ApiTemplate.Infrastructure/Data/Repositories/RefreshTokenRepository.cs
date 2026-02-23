@@ -1,4 +1,4 @@
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;

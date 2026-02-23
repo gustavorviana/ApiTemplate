@@ -5,7 +5,7 @@ namespace ApiTemplate.Application.Interfaces;
 
 public interface IDbContext
 {
-#if (EnableJwt)
+#if (EnableJwtWithDatabase)
     DbSet<User> Users { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
 #endif

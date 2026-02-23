@@ -12,11 +12,11 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.4" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
     <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageVersion Include="Viana.Results.OpenApi.Swashbuckle" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Viana.Results" Version="1.0.1" />
-    <PackageVersion Include="Viana.Results.Mvc" Version="1.0.0" />
+	  <PackageVersion Include="Viana.Results" Version="1.0.1" />
+	  <PackageVersion Include="Viana.Results.Mvc" Version="1.0.0" />
+	  <PackageVersion Include="Viana.Results.OpenApi.Swashbuckle" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.5.0" />
