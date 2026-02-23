@@ -1,3 +1,4 @@
+using ApiTemplate.Application.MessagesCatalog;
 using ApiTemplate.Application.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -38,7 +39,7 @@ public sealed class ValidationActionFilter : IActionFilter
 
             var problemResult = new ProblemResult(
                 400,
-                "One or more validation errors occurred",
+                Messages.Validation.OneOrMoreErrorsOccurred,
                 "about:blank",
                 extensions);
 

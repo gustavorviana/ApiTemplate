@@ -21,5 +21,16 @@ public static partial class Messages
 
         public const string UserNotFound =
             "User not found.";
+
+        // Validation - Login
+        public const string EmailRequired = "Email is required.";
+        public const string EmailInvalid = "Email must be a valid email address.";
+        public const string PasswordRequired = "Password is required.";
+
+        // Validation - Register
+        public const string NameRequired = "Name is required.";
+        public const string NameMinLength = "Name must be at least 2 characters.";
+        public const string NameMaxLength = "Name must not exceed 200 characters.";
+        public const string PasswordMinLength = "Password must be at least 8 characters.";
     }
 }

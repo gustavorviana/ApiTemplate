@@ -89,53 +89,71 @@
         {
           "condition": "(!UseValidation)",
           "exclude": [
-            "Src/ApiTemplate.Application/Validation/**",
-            "Src/ApiTemplate.Api/Filters/ValidationActionFilter.cs",
-            "Src/ApiTemplate.Application/UseCases/WeatherForecasts/Create/CreateWeatherForecastRequestValidator.cs",
-            "ApiTemplate.Tests/Filters/ValidationActionFilterTests.cs"
+            "**/Src/ApiTemplate.Application/MessagesCatalog/Validation.cs",
+            "**/Src/ApiTemplate.Application/Validation/**",
+            "**/Src/ApiTemplate.Application/UseCases/Auth/Login/LoginRequestValidator.cs",
+            "**/Src/ApiTemplate.Application/UseCases/Auth/Register/RegisterRequestValidator.cs",
+            "**/Src/ApiTemplate.Api/Filters/ValidationActionFilter.cs",
+            "**/Src/ApiTemplate.Application/UseCases/WeatherForecasts/Create/CreateWeatherForecastRequestValidator.cs",
+            "**/Tests/ApiTemplate.Tests/Filters/ValidationActionFilterTests.cs"
           ]
         },
         {
           "condition": "(!UseDatabase)",
           "exclude": [
-            "Src/ApiTemplate.Application/Core/Entities/User.cs",
-            "Src/ApiTemplate.Application/Interfaces/IDbContext.cs",
-            "Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
-            "Src/ApiTemplate.Infrastructure/DependencyInjection/DatabaseMigrationRunner.cs",
-            "Src/ApiTemplate.Infrastructure/Data",
-            "Src/ApiTemplate.Infrastructure/Data/**"
+            "**/Src/ApiTemplate.Application/MessagesCatalog/Auth.cs",
+            "**/Src/ApiTemplate.Application/UseCases/Auth/**",
+            "**/Src/ApiTemplate.Application/Core/Entities/RefreshToken.cs",
+            "**/Src/ApiTemplate.Application/Core/Entities/User.cs",
+            "**/Src/ApiTemplate.Application/Interfaces/IDbContext.cs",
+            "**/Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
+            "**/Src/ApiTemplate.Infrastructure/DependencyInjection/DatabaseMigrationRunner.cs",
+            "**/Src/ApiTemplate.Infrastructure/Data",
+            "**/Src/ApiTemplate.Infrastructure/Fakes/FakeWeatherForecastRepository",
+            "**/Src/ApiTemplate.Infrastructure/Data/**"
           ]
         },
         {
-          "condition": "(!EnableJwt)",
+          "condition": "(EnableJwt == false || UseDatabase == false)",
           "exclude": [
-            "Src/ApiTemplate.Api/Filters/UnauthorizedAndForbiddenOperationFilter.cs",
-            "Src/ApiTemplate.Api/DependencyInjection/JwtExtensions.cs",
-            "Src/ApiTemplate.Api/Controllers/AuthController.cs",
-            "Src/ApiTemplate.Application/UseCases/Auth",
-            "Src/ApiTemplate.Application/UseCases/Auth/**",
-            "Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
-            "Src/ApiTemplate.Application/Interfaces/IJwtService.cs",
-            "Src/ApiTemplate.Application/Interfaces/IRefreshTokenRepository.cs",
-            "Src/ApiTemplate.Application/Core/Entities/User.cs",
-            "Src/ApiTemplate.Application/Core/Entities/RefreshToken.cs",
-            "Src/ApiTemplate.Infrastructure/Auth",
-            "Src/ApiTemplate.Infrastructure/Auth/**",
-            "Src/ApiTemplate.Infrastructure/Fakes/FakeUserRepository.cs",
-            "Src/ApiTemplate.Infrastructure/Fakes/FakeRefreshTokenRepository.cs",
-            "Src/ApiTemplate.Infrastructure/Data/Repositories/UserRepository.cs",
-            "Src/ApiTemplate.Infrastructure/Data/Repositories/RefreshTokenRepository.cs",
-            "Src/ApiTemplate.Infrastructure/Data/Configurations/UserConfiguration.cs",
-            "Src/ApiTemplate.Infrastructure/Data/Configurations/RefreshTokenConfiguration.cs",
-            "Tests/ApiTemplate.Tests.Application/UseCases/Auth",
-            "Tests/ApiTemplate.Tests.Application/UseCases/Auth/**"
+            "**/Src/ApiTemplate.Api/Filters/UnauthorizedAndForbiddenOperationFilter.cs",
+            "**/Src/ApiTemplate.Api/DependencyInjection/JwtExtensions.cs",
+            "**/Src/ApiTemplate.Api/Controllers/AuthController.cs",
+            "**/Src/ApiTemplate.Application/UseCases/Auth",
+            "**/Src/ApiTemplate.Application/UseCases/Auth/**",
+            "**/Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
+            "**/Src/ApiTemplate.Application/Interfaces/IJwtService.cs",
+            "**/Src/ApiTemplate.Application/Interfaces/IRefreshTokenRepository.cs",
+            "**/Src/ApiTemplate.Application/Interfaces/IPasswordHasher.cs",
+            "**/Src/ApiTemplate.Application/Interfaces/IPasswordSecurityProvider.cs",
+            "**/Src/ApiTemplate.Application/Core/Entities/User.cs",
+            "**/Src/ApiTemplate.Application/Core/Enums/PasswordSecurityProviderType.cs",
+            "**/Src/ApiTemplate.Application/Core/Enums/PasswordStrengthStatus.cs",
+            "**/Src/ApiTemplate.Application/Core/Options/PasswordSecurityOptions.cs",
+            "**/Src/ApiTemplate.Application/Core/ValueObjects/PasswordStrengthResult.cs",
+            "**/Src/ApiTemplate.Application/Core/Entities/RefreshToken.cs",
+            "**/Src/ApiTemplate.Infrastructure/Auth",
+            "**/Src/ApiTemplate.Infrastructure/Auth/**",
+            "**/Src/ApiTemplate.Infrastructure/MessagesCatalog/PasswordSecurity.cs",
+            "**/Src/ApiTemplate.Infrastructure/Data/Repositories/UserRepository.cs",
+            "**/Src/ApiTemplate.Infrastructure/Data/Repositories/RefreshTokenRepository.cs",
+            "**/Src/ApiTemplate.Infrastructure/Data/Configurations/UserConfiguration.cs",
+            "**/Src/ApiTemplate.Infrastructure/Data/Configurations/RefreshTokenConfiguration.cs",
+            "**/Tests/ApiTemplate.Tests.Application/UseCases/Auth",
+            "**/Tests/ApiTemplate.Tests.Application/UseCases/Auth/**"
+          ]
+        },
+         {
+          "condition": "(EnableJwt == true && UseDatabase == true)",
+          "exclude": [
+            "**/Src/ApiTemplate.Infrastructure/Fakes"
           ]
         },
         {
           "condition": "(!EnableRateLimiting)",
           "exclude": [
-            "Src/ApiTemplate.Api/Extensions/RateLimitingExtensions.cs",
-            "Src/ApiTemplate.Api/Configuration/RateLimitingOptions.cs"
+            "**/Src/ApiTemplate.Api/Extensions/RateLimitingExtensions.cs",
+            "**/Src/ApiTemplate.Api/Configuration/RateLimitingOptions.cs"
           ]
         },
         {
