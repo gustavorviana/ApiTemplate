@@ -7,7 +7,8 @@ namespace ApiTemplate.Application.UseCases.Auth.Register;
 
 public class RegisterHandle(
     IUserRepository userRepository,
-    IPasswordSecurityProvider passwordSecurityProvider) : IUseCaseHandle<RegisterRequest, Result<RegisterResponse>>
+    IPasswordSecurityProvider passwordSecurityProvider,
+    IPasswordHasher passwordHasher) : IUseCaseHandle<RegisterRequest, Result<RegisterResponse>>
 {
     public async Task<Result<RegisterResponse>> ExecuteAsync(
         RegisterRequest request,
@@ -29,7 +30,7 @@ public class RegisterHandle(
             return new ProblemResult(400, message);
         }
 
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        var passwordHash = passwordHasher.Hash(request.Password);
         var user = User.Create(request.Name, request.Email, passwordHash);
         await userRepository.AddAsync(user, cancellationToken);
 

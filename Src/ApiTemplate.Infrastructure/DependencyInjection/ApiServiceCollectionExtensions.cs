@@ -93,6 +93,8 @@ public static class ApiServiceCollectionExtensions
 
         services.AddSingleton<IJwtService, JwtService>();
 
+        services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
+
         return services;
     }
 #endif

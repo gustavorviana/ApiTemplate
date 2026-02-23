@@ -30,7 +30,9 @@ public class RegisterHandleTests
             .GetByEmailAsync(existingUser.Email, Arg.Any<CancellationToken>())
             .Returns(existingUser);
 
-        var handle = new RegisterHandle(userRepository, passwordSecurityProvider);
+        var passwordHasher = Substitute.For<IPasswordHasher>();
+
+        var handle = new RegisterHandle(userRepository, passwordSecurityProvider, passwordHasher);
         var request = new RegisterRequest
         {
             Name = "New User",
@@ -72,7 +74,12 @@ public class RegisterHandleTests
                 Arg.Do<User>(u => addedUser = u),
                 Arg.Any<CancellationToken>());
 
-        var handle = new RegisterHandle(userRepository, passwordSecurityProvider);
+        var passwordHasher = Substitute.For<IPasswordHasher>();
+        passwordHasher
+            .Hash(Arg.Any<string>())
+            .Returns("hashed-password");
+
+        var handle = new RegisterHandle(userRepository, passwordSecurityProvider, passwordHasher);
         var request = new RegisterRequest
         {
             Name = "New User",
@@ -89,6 +96,7 @@ public class RegisterHandleTests
         Assert.NotNull(addedUser);
         Assert.Equal(request.Name, addedUser!.Name);
         Assert.Equal(request.Email, addedUser.Email);
+        Assert.Equal("hashed-password", addedUser.PasswordHash);
 
         var response = Assert.IsType<Result<RegisterResponse>>(result).Data!;
         Assert.Equal(addedUser.Id, response.Id);

@@ -18,11 +18,13 @@ public class LoginHandleTests
 
         var jwtService = Substitute.For<IJwtService>();
         var refreshTokenRepository = Substitute.For<IRefreshTokenRepository>();
+        var passwordHasher = Substitute.For<IPasswordHasher>();
 
         var handle = new LoginHandle(
             userRepository,
             jwtService,
-            refreshTokenRepository);
+            refreshTokenRepository,
+            passwordHasher);
 
         var request = new LoginRequest
         {
@@ -43,9 +45,8 @@ public class LoginHandleTests
     [Fact]
     public async Task ExecuteAsync_ShouldReturnUnauthorized_WhenPasswordDoesNotMatch()
     {
-        var storedPassword = "stored-password";
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(storedPassword);
-        var user = User.Create("User", "user@example.com", passwordHash);
+        var storedPasswordHash = "stored-hash";
+        var user = User.Create("User", "user@example.com", storedPasswordHash);
 
         var userRepository = Substitute.For<IUserRepository>();
         userRepository
@@ -54,11 +55,16 @@ public class LoginHandleTests
 
         var jwtService = Substitute.For<IJwtService>();
         var refreshTokenRepository = Substitute.For<IRefreshTokenRepository>();
+        var passwordHasher = Substitute.For<IPasswordHasher>();
+        passwordHasher
+            .Verify(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(false);
 
         var handle = new LoginHandle(
             userRepository,
             jwtService,
-            refreshTokenRepository);
+            refreshTokenRepository,
+            passwordHasher);
 
         var request = new LoginRequest
         {
@@ -80,7 +86,7 @@ public class LoginHandleTests
     public async Task ExecuteAsync_ShouldCreateTokens_WhenCredentialsAreValid()
     {
         var password = "password";
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+        var passwordHash = "hashed-password";
         var user = User.Create("User", "user@example.com", passwordHash);
 
         var userRepository = Substitute.For<IUserRepository>();
@@ -103,11 +109,16 @@ public class LoginHandleTests
             .Returns(refreshToken);
 
         var refreshTokenRepository = Substitute.For<IRefreshTokenRepository>();
+        var passwordHasher = Substitute.For<IPasswordHasher>();
+        passwordHasher
+            .Verify(password, passwordHash)
+            .Returns(true);
 
         var handle = new LoginHandle(
             userRepository,
             jwtService,
-            refreshTokenRepository);
+            refreshTokenRepository,
+            passwordHasher);
 
         var request = new LoginRequest
         {
