@@ -14,7 +14,7 @@
     "language": "C#",
     "type": "solution"
   },
-  "preferNameDirectory": true,
+  "preferNameDirectory": false,
   "symbols": {
     "UseValidation": {
       "type": "parameter",
