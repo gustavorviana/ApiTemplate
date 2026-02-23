@@ -1,5 +1,5 @@
 #if (EnableResult)
-using ApiTemplate.Application.Results;
+using Viana.Results;
 #endif
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
@@ -38,7 +38,7 @@ public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastR
             Summary = added.Summary
         };
 #if (EnableResult)
-        return new Result<CreateWeatherForecastResponse>(201, response);
+        return new Result<CreateWeatherForecastResponse>(response, 201);
 #else
         return response;
 #endif

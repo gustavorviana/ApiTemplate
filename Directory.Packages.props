@@ -4,13 +4,20 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.4" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.16.0" />
     <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageVersion Include="Viana.Results.OpenApi.Swashbuckle" Version="1.0.0" />
   </ItemGroup>
+  <!--#if (EnableResult) -->
+  <ItemGroup>
+    <PackageVersion Include="Viana.Results" Version="1.0.1" />
+    <PackageVersion Include="Viana.Results.Mvc" Version="1.0.0" />
+  </ItemGroup>
+  <!--#endif -->
   <ItemGroup>
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.5.0" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="9.5.0" />
@@ -26,28 +33,26 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.12.0" />
   </ItemGroup>
-	<!--#if (UseDatabase) -->
-	<ItemGroup>
-		<PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
-		<PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9" />
-		<PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9" />
-	</ItemGroup>
-
-	<!--#if (UseSqlServer) -->
-	<ItemGroup>
-		<PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
-	</ItemGroup>
-	<!--#elif (UsePostgres) -->
-	<ItemGroup>
-		<PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
-	</ItemGroup>
-	<!--#elif (UseMySQL) -->
-	<ItemGroup>
-		<PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
-	</ItemGroup>
-	<!--#endif -->
-
-	<!--#endif -->
+  <!--#if (UseDatabase) -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9" />
+  </ItemGroup>
+  <!--#if (UseSqlServer) -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
+  </ItemGroup>
+  <!--#elif (UsePostgres) -->
+  <ItemGroup>
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+  </ItemGroup>
+  <!--#elif (UseMySQL) -->
+  <ItemGroup>
+    <PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+  </ItemGroup>
+  <!--#endif -->
+  <!--#endif -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />

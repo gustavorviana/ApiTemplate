@@ -1,11 +1,10 @@
-using ApiTemplate.Application.Results;
-using ApiTemplate.Api.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Routing;
+using Viana.Results;
 
 namespace ApiTemplate.Tests.Filters;
 

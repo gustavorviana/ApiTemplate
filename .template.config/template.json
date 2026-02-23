@@ -89,19 +89,6 @@
     {
       "modifiers": [
         {
-          "condition": "(!EnableResult)",
-          "exclude": [
-            "Src/ApiTemplate.Application/Results",
-            "Src/ApiTemplate.Application/Results/**",
-            "Src/ApiTemplate.Api/Filters/ResultToProblemResultFilter.cs",
-            "Src/ApiTemplate.Api/Serialization",
-            "Src/ApiTemplate.Api/Serialization/**",
-            "ApiTemplate.Tests/Results",
-            "ApiTemplate.Tests/Results/**",
-            "ApiTemplate.Tests/Filters/ResultToProblemResultFilterTests.cs"
-          ]
-        },
-        {
           "condition": "(!UseValidation)",
           "exclude": [
             "Src/ApiTemplate.Application/Validation/**",
@@ -124,7 +111,8 @@
         {
           "condition": "(!EnableResult && !EnableJwt)",
           "exclude": [
-            "Src/ApiTemplate.Api/DependencyInjection/SwaggerExtensions.cs"
+            "Src/ApiTemplate.Api/DependencyInjection/SwaggerExtensions.cs",
+            "Src/ApiTemplate.Api/Filters/UnauthorizedAndForbiddenOperationFilter.cs"
           ]
         },
         {

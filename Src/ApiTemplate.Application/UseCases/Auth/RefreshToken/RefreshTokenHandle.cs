@@ -1,5 +1,5 @@
 #if (EnableResult)
-using ApiTemplate.Application.Results;
+using Viana.Results;
 #endif
 using System.Security.Claims;
 using ApiTemplate.Application.Interfaces;
@@ -92,7 +92,7 @@ public class RefreshTokenHandle : IUseCaseHandle<RefreshTokenRequest, RefreshTok
         };
 
 #if (EnableResult)
-        return new Result<RefreshTokenResponse>(200, response);
+        return new Result<RefreshTokenResponse>(response);
 #else
         return response;
 #endif

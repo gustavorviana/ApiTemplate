@@ -1,5 +1,5 @@
 #if (EnableResult)
-using ApiTemplate.Application.Results;
+using Viana.Results;
 #endif
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
@@ -50,7 +50,7 @@ public class RegisterHandle : IUseCaseHandle<RegisterRequest, RegisterResponse?>
         };
 
 #if (EnableResult)
-        return new Result<RegisterResponse>(201, response);
+        return new Result<RegisterResponse>(response, 201);
 #else
         return response;
 #endif

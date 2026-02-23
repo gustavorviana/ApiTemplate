@@ -3,12 +3,10 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Folder Name="/Src/">
-    <Project Path="Src/ApiTemplate.AppHost/ApiTemplate.AppHost.csproj" />
-    <Project Path="Src/ApiTemplate.Application/ApiTemplate.Application.csproj" Id="eee623e0-6cce-4132-aed0-575632f0bd3c" />
-    <Project Path="Src/ApiTemplate.Infrastructure/ApiTemplate.Infrastructure.csproj" />
     <Project Path="Src/ApiTemplate.Api/ApiTemplate.Api.csproj" />
+    <Project Path="Src/ApiTemplate.AppHost/ApiTemplate.AppHost.csproj" />
+    <Project Path="Src/ApiTemplate.Application/ApiTemplate.Application.csproj"/>
+    <Project Path="Src/ApiTemplate.Infrastructure/ApiTemplate.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/Tests/">
-    <Project Path="ApiTemplate.Tests/ApiTemplate.Tests.csproj" Id="9e1aec43-232c-44f3-8c0d-5721a1fd81e5" />
-  </Folder>
+  <Folder Name="/Tests/" />
 </Solution>

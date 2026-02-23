@@ -1,5 +1,5 @@
 #if (EnableResult)
-using ApiTemplate.Application.Results;
+using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases;
 

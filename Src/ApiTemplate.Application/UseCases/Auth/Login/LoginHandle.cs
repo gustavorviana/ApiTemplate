@@ -1,5 +1,5 @@
 #if (EnableResult)
-using ApiTemplate.Application.Results;
+using Viana.Results;
 #endif
 using ApiTemplate.Application.Interfaces;
 
@@ -57,7 +57,7 @@ public class LoginHandle : IUseCaseHandle<LoginRequest, LoginResponse?>
         };
 
 #if (EnableResult)
-        return new Result<LoginResponse>(200, response);
+        return new Result<LoginResponse>(response);
 #else
         return response;
 #endif

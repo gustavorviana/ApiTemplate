@@ -1,7 +1,8 @@
 using ApiTemplate.Api.DependencyInjection;
 #if (EnableResult)
 using ApiTemplate.Api.Filters;
-using ApiTemplate.Api.Serialization;
+using Viana.Results.Mvc;
+using Viana.Results.Mvc.Filters;
 #endif
 using ApiTemplate.Infrastructure.DependencyInjection;
 
@@ -17,12 +18,8 @@ builder.Services.AddControllers(options =>
 #if (UseValidation)
 	options.Filters.Add<ValidationActionFilter>();
 #endif
-    options.Filters.Add<ApplicationResultFilter>();
-})
-.AddJsonOptions(json =>
-{
-	json.JsonSerializerOptions.Converters.Add(new ProblemResultJsonConverter());
-});
+    options.Filters.Add<VianaResultFilter>();
+}).AddVianaResultFilter();
 #else
 builder.Services.AddControllers();
 #endif

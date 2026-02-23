@@ -4,7 +4,7 @@ using ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 #if (EnableResult)
-using IResult = ApiTemplate.Application.Results.IResult;
+using Viana.Results;
 #endif
 
 namespace ApiTemplate.Api.Controllers;
@@ -15,7 +15,7 @@ public class WeatherForecastController : ControllerBase
 {
     [HttpGet(Name = "GetWeatherForecast")]
 #if (EnableResult)
-    public async Task<IResult> Get(
+    public async Task<ListResult<GetAllWeatherForecastResponse>> Get(
 #else
     public async Task<List<GetAllWeatherForecastResponse>> Get(
 #endif
@@ -28,7 +28,7 @@ public class WeatherForecastController : ControllerBase
 #endif
     [HttpPost(Name = "CreateWeatherForecast")]
 #if (EnableResult)
-    public async Task<IResult> Create(
+    public async Task<IResult<CreateWeatherForecastResponse>> Create(
 #else
     public async Task<CreateWeatherForecastResponse> Create(
 #endif
@@ -42,7 +42,7 @@ public class WeatherForecastController : ControllerBase
 #endif
     [HttpDelete("{id:int}", Name = "DeleteWeatherForecast")]
 #if (EnableResult)
-    public async Task<IResult> Delete(
+    public async Task<Result> Delete(
         [FromServices] DeleteWeatherForecastHandle handle,
         [FromRoute] int id,
         CancellationToken token)

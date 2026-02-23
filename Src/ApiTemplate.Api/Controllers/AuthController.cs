@@ -2,10 +2,12 @@ using ApiTemplate.Application.UseCases.Auth.Login;
 using ApiTemplate.Application.UseCases.Auth.RefreshToken;
 using Microsoft.AspNetCore.Mvc;
 #if (EnableResult)
-using IResult = ApiTemplate.Application.Results.IResult;
+using IResult = Viana.Results.IResult;
+using Viana.Results;
 #endif
 #if (UseDatabase)
 using ApiTemplate.Application.UseCases.Auth.Register;
+using ApiTemplate.Application.UseCases.Auth.Login;
 #endif
 
 namespace ApiTemplate.Api.Controllers;
@@ -17,7 +19,7 @@ public class AuthController : ControllerBase
 #if (UseDatabase)
     [HttpPost("register")]
 #if (EnableResult)
-    public async Task<IResult> Register(
+    public async Task<IResult<RegisterResponse>> Register(
 #else
     public async Task<IActionResult> Register(
 #endif
@@ -36,7 +38,7 @@ public class AuthController : ControllerBase
 #endif
     [HttpPost("login")]
 #if (EnableResult)
-    public async Task<IResult> Login(
+    public async Task<IResult<LoginResponse>> Login(
 #else
     public async Task<IActionResult> Login(
 #endif

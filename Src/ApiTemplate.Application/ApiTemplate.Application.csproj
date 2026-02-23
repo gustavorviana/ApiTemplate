@@ -23,6 +23,7 @@
 <!--#if (UseDatabase) -->
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Viana.Results" />
   </ItemGroup>
 <!--#endif -->
 </Project>

@@ -1,7 +1,7 @@
-using ApiTemplate.Application.Results;
 using ApiTemplate.Application.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Viana.Results;
 
 namespace ApiTemplate.Api.Filters;
 
