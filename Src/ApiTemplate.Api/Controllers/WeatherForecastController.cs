@@ -23,7 +23,9 @@ public class WeatherForecastController : ControllerBase
         CancellationToken token)
         => await handle.ExecuteAsync(new GetAllWeatherForecastRequest(), token);
 
+#if (EnableJwt)
     [Authorize]
+#endif
     [HttpPost(Name = "CreateWeatherForecast")]
 #if (EnableResult)
     public async Task<IResult> Create(
@@ -35,7 +37,9 @@ public class WeatherForecastController : ControllerBase
         CancellationToken token)
         => await handle.ExecuteAsync(request, token);
 
+#if (EnableJwt)
     [Authorize]
+#endif
     [HttpDelete("{id:int}", Name = "DeleteWeatherForecast")]
 #if (EnableResult)
     public async Task<IResult> Delete(

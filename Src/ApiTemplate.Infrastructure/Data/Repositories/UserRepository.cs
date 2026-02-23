@@ -1,3 +1,4 @@
+#if (EnableJwt)
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -34,3 +35,4 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 }
+#endif

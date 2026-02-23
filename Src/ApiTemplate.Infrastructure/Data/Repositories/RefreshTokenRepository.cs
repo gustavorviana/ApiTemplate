@@ -1,3 +1,4 @@
+#if (EnableJwt)
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -28,3 +29,4 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 }
+#endif

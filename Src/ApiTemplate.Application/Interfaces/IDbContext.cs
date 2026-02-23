@@ -5,8 +5,10 @@ namespace ApiTemplate.Application.Interfaces;
 
 public interface IDbContext
 {
+#if (EnableJwt)
     DbSet<User> Users { get; }
-    DbSet<WeatherForecast> WeatherForecasts { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
+#endif
+    DbSet<WeatherForecast> WeatherForecasts { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

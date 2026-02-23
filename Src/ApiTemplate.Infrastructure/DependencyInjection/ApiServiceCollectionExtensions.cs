@@ -1,6 +1,8 @@
 using ApiTemplate.Application.DependencyInjection;
 using ApiTemplate.Application.Interfaces;
+#if (EnableJwt)
 using ApiTemplate.Infrastructure.Auth;
+#endif
 #if (UseDatabase)
 using Microsoft.Extensions.Configuration;
 using ApiTemplate.Infrastructure.Data;
@@ -36,7 +38,9 @@ public static class ApiServiceCollectionExtensions
             http.AddServiceDiscovery();
         });
 
+#if (EnableJwt)
         builder.Services.AddJwtServices(builder.Configuration);
+#endif
 
         // Uncomment the following to restrict the allowed schemes for service discovery.
         // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
@@ -48,13 +52,16 @@ public static class ApiServiceCollectionExtensions
         builder.Services.AddDatabase(builder.Configuration.GetConnectionString("DefaultConnection")!);
 #else
         builder.Services.AddScoped<IWeatherForecastRepository, FakeWeatherForecastRepository>();
+#if (EnableJwt)
         builder.Services.AddScoped<IUserRepository, FakeUserRepository>();
         builder.Services.AddScoped<IRefreshTokenRepository, FakeRefreshTokenRepository>();
+#endif
 #endif
 
         return builder;
     }
 
+#if (EnableJwt)
     private static IServiceCollection AddJwtServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
@@ -62,6 +69,7 @@ public static class ApiServiceCollectionExtensions
 
         return services;
     }
+#endif
 
 #if (UseDatabase)
     private static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
@@ -78,9 +86,11 @@ public static class ApiServiceCollectionExtensions
         });
 
         services.AddScoped<IDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+#if (EnableJwt)
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IWeatherForecastRepository, WeatherForecastRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+#endif
+        services.AddScoped<IWeatherForecastRepository, WeatherForecastRepository>();
 
         return services;
     }

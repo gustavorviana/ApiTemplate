@@ -77,6 +77,12 @@
       "datatype": "bool",
       "defaultValue": "false",
       "description": "Run EF Core migrations when the application starts (only when database is enabled)."
+    },
+    "EnableJwt": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Enables JWT authentication, Auth endpoints, and User/RefreshToken entities"
     }
   },
   "sources": [
@@ -113,6 +119,34 @@
             "Src/ApiTemplate.Infrastructure/DependencyInjection/DatabaseMigrationRunner.cs",
             "Src/ApiTemplate.Infrastructure/Data",
             "Src/ApiTemplate.Infrastructure/Data/**"
+          ]
+        },
+        {
+          "condition": "(!EnableResult && !EnableJwt)",
+          "exclude": [
+            "Src/ApiTemplate.Api/DependencyInjection/SwaggerExtensions.cs"
+          ]
+        },
+        {
+          "condition": "(!EnableJwt)",
+          "exclude": [
+            "Src/ApiTemplate.Api/DependencyInjection/JwtExtensions.cs",
+            "Src/ApiTemplate.Api/Controllers/AuthController.cs",
+            "Src/ApiTemplate.Application/UseCases/Auth",
+            "Src/ApiTemplate.Application/UseCases/Auth/**",
+            "Src/ApiTemplate.Application/Interfaces/IUserRepository.cs",
+            "Src/ApiTemplate.Application/Interfaces/IJwtService.cs",
+            "Src/ApiTemplate.Application/Interfaces/IRefreshTokenRepository.cs",
+            "Src/ApiTemplate.Application/Core/Entities/User.cs",
+            "Src/ApiTemplate.Application/Core/Entities/RefreshToken.cs",
+            "Src/ApiTemplate.Infrastructure/Auth",
+            "Src/ApiTemplate.Infrastructure/Auth/**",
+            "Src/ApiTemplate.Infrastructure/Fakes/FakeUserRepository.cs",
+            "Src/ApiTemplate.Infrastructure/Fakes/FakeRefreshTokenRepository.cs",
+            "Src/ApiTemplate.Infrastructure/Data/Repositories/UserRepository.cs",
+            "Src/ApiTemplate.Infrastructure/Data/Repositories/RefreshTokenRepository.cs",
+            "Src/ApiTemplate.Infrastructure/Data/Configurations/UserConfiguration.cs",
+            "Src/ApiTemplate.Infrastructure/Data/Configurations/RefreshTokenConfiguration.cs"
           ]
         },
         {

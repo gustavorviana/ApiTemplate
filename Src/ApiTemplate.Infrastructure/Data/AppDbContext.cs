@@ -8,9 +8,11 @@ public class AppDbContext : DbContext, IDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
+#if (EnableJwt)
     public DbSet<User> Users => Set<User>();
-    public DbSet<WeatherForecast> WeatherForecasts => Set<WeatherForecast>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+#endif
+    public DbSet<WeatherForecast> WeatherForecasts => Set<WeatherForecast>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
         => modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
