@@ -1,16 +1,10 @@
-#if (EnableResult)
 using Viana.Results;
-#endif
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 
 namespace ApiTemplate.Application.UseCases.Auth.Register;
 
-#if (EnableResult)
 public class RegisterHandle : IUseCaseHandle<RegisterRequest, Result<RegisterResponse>>
-#else
-public class RegisterHandle : IUseCaseHandle<RegisterRequest, RegisterResponse?>
-#endif
 {
     private readonly IUserRepository _userRepository;
 
@@ -19,11 +13,7 @@ public class RegisterHandle : IUseCaseHandle<RegisterRequest, RegisterResponse?>
         _userRepository = userRepository;
     }
 
-#if (EnableResult)
     public async Task<Result<RegisterResponse>> ExecuteAsync(
-#else
-    public async Task<RegisterResponse?> ExecuteAsync(
-#endif
         RegisterRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -31,11 +21,7 @@ public class RegisterHandle : IUseCaseHandle<RegisterRequest, RegisterResponse?>
 
         if (existing is not null)
         {
-#if (EnableResult)
             return new ProblemResult(409, "User with this email already exists.");
-#else
-            return null;
-#endif
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -49,10 +35,6 @@ public class RegisterHandle : IUseCaseHandle<RegisterRequest, RegisterResponse?>
             Email = user.Email
         };
 
-#if (EnableResult)
         return new Result<RegisterResponse>(response, 201);
-#else
-        return response;
-#endif
     }
 }

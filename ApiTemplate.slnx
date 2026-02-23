@@ -5,8 +5,11 @@
   <Folder Name="/Src/">
     <Project Path="Src/ApiTemplate.Api/ApiTemplate.Api.csproj" />
     <Project Path="Src/ApiTemplate.AppHost/ApiTemplate.AppHost.csproj" />
-    <Project Path="Src/ApiTemplate.Application/ApiTemplate.Application.csproj"/>
+    <Project Path="Src/ApiTemplate.Application/ApiTemplate.Application.csproj" />
     <Project Path="Src/ApiTemplate.Infrastructure/ApiTemplate.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/Tests/" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/ApiTemplate.Tests.Application/ApiTemplate.Tests.Application.csproj" Id="4a8d793e-f98c-4775-ae0a-15ea962a7965" />
+    <Project Path="Tests/ApiTemplate.Tests.Infrastructure/ApiTemplate.Tests.Infrastructure.csproj" Id="f8f2feb9-2fdb-43a0-891f-b98035c966ad" />
+  </Folder>
 </Solution>

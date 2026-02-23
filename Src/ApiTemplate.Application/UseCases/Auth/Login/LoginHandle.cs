@@ -1,15 +1,9 @@
-#if (EnableResult)
-using Viana.Results;
-#endif
 using ApiTemplate.Application.Interfaces;
+using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases.Auth.Login;
 
-#if (EnableResult)
 public class LoginHandle : IUseCaseHandle<LoginRequest, Result<LoginResponse>>
-#else
-public class LoginHandle : IUseCaseHandle<LoginRequest, LoginResponse?>
-#endif
 {
     private readonly IUserRepository _userRepository;
     private readonly IJwtService _jwtService;
@@ -25,11 +19,7 @@ public class LoginHandle : IUseCaseHandle<LoginRequest, LoginResponse?>
         _refreshTokenRepository = refreshTokenRepository;
     }
 
-#if (EnableResult)
     public async Task<Result<LoginResponse>> ExecuteAsync(
-#else
-    public async Task<LoginResponse?> ExecuteAsync(
-#endif
         LoginRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -37,11 +27,7 @@ public class LoginHandle : IUseCaseHandle<LoginRequest, LoginResponse?>
 
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-#if (EnableResult)
             return new ProblemResult(401, "Invalid email or password.");
-#else
-            return null;
-#endif
         }
 
         var accessToken = _jwtService.GenerateAccessToken(user);
@@ -56,10 +42,6 @@ public class LoginHandle : IUseCaseHandle<LoginRequest, LoginResponse?>
             ExpiresAt = refreshToken.ExpiresAt
         };
 
-#if (EnableResult)
         return new Result<LoginResponse>(response);
-#else
-        return response;
-#endif
     }
 }

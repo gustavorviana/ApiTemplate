@@ -24,11 +24,9 @@
 		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.Http" />
 		<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
-		<!--#if (EnableResult) -->
 
 		<PackageReference Include="Viana.Results" />
 		<PackageReference Include="Viana.Results.Mvc" />
-		<!--#endif -->
 	</ItemGroup>
 
 </Project>

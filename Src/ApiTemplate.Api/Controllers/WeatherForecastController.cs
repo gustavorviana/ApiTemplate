@@ -3,9 +3,7 @@ using ApiTemplate.Application.UseCases.WeatherForecasts.Delete;
 using ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-#if (EnableResult)
 using Viana.Results;
-#endif
 
 namespace ApiTemplate.Api.Controllers;
 
@@ -14,11 +12,7 @@ namespace ApiTemplate.Api.Controllers;
 public class WeatherForecastController : ControllerBase
 {
     [HttpGet(Name = "GetWeatherForecast")]
-#if (EnableResult)
     public async Task<ListResult<GetAllWeatherForecastResponse>> Get(
-#else
-    public async Task<List<GetAllWeatherForecastResponse>> Get(
-#endif
         [FromServices] GetAllWeatherForecastHandle handle,
         CancellationToken token)
         => await handle.ExecuteAsync(new GetAllWeatherForecastRequest(), token);
@@ -27,11 +21,7 @@ public class WeatherForecastController : ControllerBase
     [Authorize]
 #endif
     [HttpPost(Name = "CreateWeatherForecast")]
-#if (EnableResult)
     public async Task<IResult<CreateWeatherForecastResponse>> Create(
-#else
-    public async Task<CreateWeatherForecastResponse> Create(
-#endif
         [FromServices] CreateWeatherForecastHandle handle,
         [FromBody] CreateWeatherForecastRequest request,
         CancellationToken token)
@@ -41,20 +31,9 @@ public class WeatherForecastController : ControllerBase
     [Authorize]
 #endif
     [HttpDelete("{id:int}", Name = "DeleteWeatherForecast")]
-#if (EnableResult)
     public async Task<Result> Delete(
         [FromServices] DeleteWeatherForecastHandle handle,
         [FromRoute] int id,
         CancellationToken token)
         => await handle.ExecuteAsync(new DeleteWeatherForecastRequest { Id = id }, token);
-#else
-    public async Task<IActionResult> Delete(
-        [FromServices] DeleteWeatherForecastHandle handle,
-        [FromRoute] int id,
-        CancellationToken token)
-    {
-        var deleted = await handle.ExecuteAsync(new DeleteWeatherForecastRequest { Id = id }, token);
-        return deleted ? NoContent() : NotFound();
-    }
-#endif
 }

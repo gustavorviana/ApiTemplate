@@ -1,13 +1,9 @@
-#if EnableResult && EnableJwt
+#if !EnableJwt
 using ApiTemplate.Api.Filters;
-#endif
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-#if (EnableResult)
-using Viana.Results.OpenApi.Swashbuckle;
 #endif
+using Viana.Results.OpenApi.Swashbuckle;
 
 namespace ApiTemplate.Api.DependencyInjection;
 
@@ -21,13 +17,9 @@ public static class SwaggerExtensions
 		services.AddEndpointsApiExplorer();
 		services.AddSwaggerGen(options =>
 		{
-#if (EnableResult)
             options.AddVianaResultFilters();
-#endif
 #if (EnableJwt)
 			ConfigureJwtForSwagger(options);
-#endif
-#if (EnableResult && EnableJwt)
 			options.OperationFilter<UnauthorizedAndForbiddenOperationFilter>();
 #endif
         });

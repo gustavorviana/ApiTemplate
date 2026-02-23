@@ -16,21 +16,11 @@
   },
   "preferNameDirectory": true,
   "symbols": {
-    "UseResult": {
-      "type": "parameter",
-      "datatype": "bool",
-      "defaultValue": "true",
-      "description": "Includes the Result pattern (Result, ProblemResult, ListResult, PagedResult)"
-    },
     "UseValidation": {
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "true",
       "description": "Includes FluentValidation support. When enabled, the Result pattern is also required and will be included automatically."
-    },
-    "EnableResult": {
-      "type": "computed",
-      "value": "(UseResult || UseValidation)"
     },
     "DatabaseProvider": {
       "type": "parameter",
@@ -109,9 +99,8 @@
           ]
         },
         {
-          "condition": "(!EnableResult && !EnableJwt)",
+          "condition": "(!EnableJwt)",
           "exclude": [
-            "Src/ApiTemplate.Api/DependencyInjection/SwaggerExtensions.cs",
             "Src/ApiTemplate.Api/Filters/UnauthorizedAndForbiddenOperationFilter.cs"
           ]
         },
@@ -134,7 +123,9 @@
             "Src/ApiTemplate.Infrastructure/Data/Repositories/UserRepository.cs",
             "Src/ApiTemplate.Infrastructure/Data/Repositories/RefreshTokenRepository.cs",
             "Src/ApiTemplate.Infrastructure/Data/Configurations/UserConfiguration.cs",
-            "Src/ApiTemplate.Infrastructure/Data/Configurations/RefreshTokenConfiguration.cs"
+            "Src/ApiTemplate.Infrastructure/Data/Configurations/RefreshTokenConfiguration.cs",
+            "Tests/ApiTemplate.Tests.Application/UseCases/Auth",
+            "Tests/ApiTemplate.Tests.Application/UseCases/Auth/**"
           ]
         },
         {
@@ -147,6 +138,23 @@
           ]
         }
       ]
+    }
+  ],
+  "postActions": [
+    {
+      "id": "AddInitialEfCoreMigration",
+      "description": "Generate the initial EF Core migration.",
+      "condition": "UseDatabase",
+      "actionId": "E7F29F54-2F0B-4A0B-8A1F-9F4B3B6C1A2",
+      "manualInstructions": [
+        {
+          "text": "To generate the initial EF Core migration, run the following command from the solution root:"
+        },
+        {
+          "text": "dotnet ef migrations add InitialCreate --project Src/<YourProject>.Infrastructure --startup-project Src/<YourProject>.Api --output-dir Data/Migrations"
+        }
+      ],
+      "continueOnError": true
     }
   ]
 }

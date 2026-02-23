@@ -1,16 +1,10 @@
-#if (EnableResult)
-using Viana.Results;
-#endif
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
+using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases.WeatherForecasts.Create;
 
-#if (EnableResult)
 public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastRequest, Result<CreateWeatherForecastResponse>>
-#else
-public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastRequest, CreateWeatherForecastResponse>
-#endif
 {
     private readonly IWeatherForecastRepository _repository;
 
@@ -19,11 +13,7 @@ public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastR
         _repository = repository;
     }
 
-#if (EnableResult)
     public async Task<Result<CreateWeatherForecastResponse>> ExecuteAsync(
-#else
-    public async Task<CreateWeatherForecastResponse> ExecuteAsync(
-#endif
         CreateWeatherForecastRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -37,10 +27,6 @@ public class CreateWeatherForecastHandle : IUseCaseHandle<CreateWeatherForecastR
             TemperatureC = added.TemperatureC,
             Summary = added.Summary
         };
-#if (EnableResult)
         return new Result<CreateWeatherForecastResponse>(response, 201);
-#else
-        return response;
-#endif
     }
 }

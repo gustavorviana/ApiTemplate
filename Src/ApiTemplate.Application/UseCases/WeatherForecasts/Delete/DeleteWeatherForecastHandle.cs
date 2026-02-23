@@ -1,15 +1,9 @@
-#if (EnableResult)
-using Viana.Results;
-#endif
 using ApiTemplate.Application.Interfaces;
+using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases.WeatherForecasts.Delete;
 
-#if (EnableResult)
 public class DeleteWeatherForecastHandle : IUseCaseHandle<DeleteWeatherForecastRequest, Result>
-#else
-public class DeleteWeatherForecastHandle : IUseCaseHandle<DeleteWeatherForecastRequest, bool>
-#endif
 {
     private readonly IWeatherForecastRepository _repository;
 
@@ -18,7 +12,6 @@ public class DeleteWeatherForecastHandle : IUseCaseHandle<DeleteWeatherForecastR
         _repository = repository;
     }
 
-#if (EnableResult)
     public async Task<Result> ExecuteAsync(DeleteWeatherForecastRequest request, CancellationToken cancellationToken = default)
     {
         var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
@@ -27,14 +20,4 @@ public class DeleteWeatherForecastHandle : IUseCaseHandle<DeleteWeatherForecastR
         await _repository.DeleteAsync(entity, cancellationToken);
         return new Result(204);
     }
-#else
-    public async Task<bool> ExecuteAsync(DeleteWeatherForecastRequest request, CancellationToken cancellationToken = default)
-    {
-        var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
-        if (entity is null)
-            return false;
-        await _repository.DeleteAsync(entity, cancellationToken);
-        return true;
-    }
-#endif
 }
