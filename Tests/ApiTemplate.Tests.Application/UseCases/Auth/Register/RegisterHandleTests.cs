@@ -3,6 +3,8 @@ using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.UseCases.Auth.Register;
 using NSubstitute;
+using ApiTemplate.Application.Core.ValueObjects;
+using ApiTemplate.Application.Core.Enums;
 
 namespace ApiTemplate.Tests.Application.UseCases.Auth.Register;
 
@@ -14,11 +16,21 @@ public class RegisterHandleTests
         var existingUser = User.Create("Existing", "user@example.com", "hash");
 
         var userRepository = Substitute.For<IUserRepository>();
+        var passwordSecurityProvider = Substitute.For<IPasswordSecurityProvider>();
+        passwordSecurityProvider
+            .Evaluate(Arg.Any<string>())
+            .Returns(
+                _ => new PasswordStrengthResult
+                {
+                    Strength = PasswordStrengthStatus.Strong,
+                    MinimumRequired = PasswordStrengthStatus.Medium
+                });
+
         userRepository
             .GetByEmailAsync(existingUser.Email, Arg.Any<CancellationToken>())
             .Returns(existingUser);
 
-        var handle = new RegisterHandle(userRepository);
+        var handle = new RegisterHandle(userRepository, passwordSecurityProvider);
         var request = new RegisterRequest
         {
             Name = "New User",
@@ -40,6 +52,16 @@ public class RegisterHandleTests
     public async Task ExecuteAsync_ShouldCreateUser_WhenEmailDoesNotExist()
     {
         var userRepository = Substitute.For<IUserRepository>();
+        var passwordSecurityProvider = Substitute.For<IPasswordSecurityProvider>();
+        passwordSecurityProvider
+            .Evaluate(Arg.Any<string>())
+            .Returns(
+                _ => new PasswordStrengthResult
+                {
+                    Strength = PasswordStrengthStatus.Strong,
+                    MinimumRequired = PasswordStrengthStatus.Medium
+                });
+
         userRepository
             .GetByEmailAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((User?)null);
@@ -50,7 +72,7 @@ public class RegisterHandleTests
                 Arg.Do<User>(u => addedUser = u),
                 Arg.Any<CancellationToken>());
 
-        var handle = new RegisterHandle(userRepository);
+        var handle = new RegisterHandle(userRepository, passwordSecurityProvider);
         var request = new RegisterRequest
         {
             Name = "New User",

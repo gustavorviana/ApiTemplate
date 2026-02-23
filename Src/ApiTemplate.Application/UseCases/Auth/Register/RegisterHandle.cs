@@ -1,32 +1,37 @@
 using Viana.Results;
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
+using ApiTemplate.Application.MessagesCatalog;
 
 namespace ApiTemplate.Application.UseCases.Auth.Register;
 
-public class RegisterHandle : IUseCaseHandle<RegisterRequest, Result<RegisterResponse>>
+public class RegisterHandle(
+    IUserRepository userRepository,
+    IPasswordSecurityProvider passwordSecurityProvider) : IUseCaseHandle<RegisterRequest, Result<RegisterResponse>>
 {
-    private readonly IUserRepository _userRepository;
-
-    public RegisterHandle(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
-
     public async Task<Result<RegisterResponse>> ExecuteAsync(
         RegisterRequest request,
         CancellationToken cancellationToken = default)
     {
-        var existing = await _userRepository.GetByEmailAsync(request.Email, cancellationToken);
+        var existing = await userRepository.GetByEmailAsync(request.Email, cancellationToken);
 
         if (existing is not null)
+            return new ProblemResult(409, Messages.Auth.UserWithEmailAlreadyExists);
+
+        var strengthResult = passwordSecurityProvider.Evaluate(request.Password);
+
+        if (!strengthResult.MeetsMinimum)
         {
-            return new ProblemResult(409, "User with this email already exists.");
+            var message = string.IsNullOrWhiteSpace(strengthResult.MissingRequirements)
+                ? Messages.Auth.PasswordMinimumRequirementsNotMet
+                : strengthResult.MissingRequirements;
+
+            return new ProblemResult(400, message);
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
         var user = User.Create(request.Name, request.Email, passwordHash);
-        await _userRepository.AddAsync(user, cancellationToken);
+        await userRepository.AddAsync(user, cancellationToken);
 
         var response = new RegisterResponse
         {

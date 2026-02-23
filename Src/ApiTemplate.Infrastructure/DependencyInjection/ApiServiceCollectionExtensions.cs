@@ -1,6 +1,8 @@
 using ApiTemplate.Application.DependencyInjection;
 using ApiTemplate.Application.Interfaces;
 #if (EnableJwt)
+using ApiTemplate.Application.Core.Enums;
+using ApiTemplate.Application.Core.Options;
 using ApiTemplate.Infrastructure.Auth;
 #endif
 #if (UseDatabase)
@@ -39,7 +41,10 @@ public static class ApiServiceCollectionExtensions
         });
 
 #if (EnableJwt)
-        builder.Services.AddJwtServices(builder.Configuration);
+        builder.Services.AddJwtServices(
+            builder.Configuration,
+            PasswordSecurityProviderType.Basic,
+            PasswordStrengthStatus.Medium);
 #endif
 
         // Uncomment the following to restrict the allowed schemes for service discovery.
@@ -62,9 +67,30 @@ public static class ApiServiceCollectionExtensions
     }
 
 #if (EnableJwt)
-    private static IServiceCollection AddJwtServices(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddJwtServices(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        PasswordSecurityProviderType providerType,
+        PasswordStrengthStatus minimumStrength)
     {
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+
+        var passwordOptions = new PasswordSecurityOptions
+        {
+            ProviderType = providerType,
+            MinimumStrength = minimumStrength
+        };
+
+        services.AddSingleton(passwordOptions);
+
+        services.AddSingleton<IPasswordSecurityProvider>(_ =>
+            providerType switch
+            {
+                PasswordSecurityProviderType.Basic => new BasicPasswordSecurityProvider(passwordOptions),
+                PasswordSecurityProviderType.IsoStandard => new IsoPasswordSecurityProvider(passwordOptions),
+                _ => new BasicPasswordSecurityProvider(passwordOptions)
+            });
+
         services.AddSingleton<IJwtService, JwtService>();
 
         return services;

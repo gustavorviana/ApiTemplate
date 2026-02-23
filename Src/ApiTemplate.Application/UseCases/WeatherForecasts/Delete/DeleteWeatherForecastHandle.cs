@@ -1,4 +1,5 @@
 using ApiTemplate.Application.Interfaces;
+using ApiTemplate.Application.MessagesCatalog;
 using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases.WeatherForecasts.Delete;
@@ -16,7 +17,7 @@ public class DeleteWeatherForecastHandle : IUseCaseHandle<DeleteWeatherForecastR
     {
         var entity = await _repository.GetByIdAsync(request.Id, cancellationToken);
         if (entity is null)
-            return new Result(404, new ProblemResult(404, "Weather forecast not found."));
+            return new Result(404, new ProblemResult(404, Messages.WeatherForecast.WeatherForecastNotFound));
         await _repository.DeleteAsync(entity, cancellationToken);
         return new Result(204);
     }

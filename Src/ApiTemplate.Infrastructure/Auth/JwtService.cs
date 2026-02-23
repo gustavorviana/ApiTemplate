@@ -1,22 +1,17 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ApiTemplate.Infrastructure.Auth;
 
-public class JwtService : IJwtService
+public class JwtService(IOptions<JwtSettings> settings) : IJwtService
 {
-    private readonly JwtSettings _settings;
-
-    public JwtService(IOptions<JwtSettings> settings)
-    {
-        _settings = settings.Value;
-    }
+    private readonly JwtSettings _settings = settings.Value;
 
     public string GenerateAccessToken(User user)
     {

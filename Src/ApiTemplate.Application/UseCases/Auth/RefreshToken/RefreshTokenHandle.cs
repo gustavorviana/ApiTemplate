@@ -1,6 +1,7 @@
 using Viana.Results;
 using System.Security.Claims;
 using ApiTemplate.Application.Interfaces;
+using ApiTemplate.Application.MessagesCatalog;
 
 namespace ApiTemplate.Application.UseCases.Auth.RefreshToken;
 
@@ -27,7 +28,7 @@ public class RefreshTokenHandle : IUseCaseHandle<RefreshTokenRequest, Result<Ref
         var principal = _jwtService.GetPrincipalFromExpiredToken(request.AccessToken);
         if (principal is null)
         {
-            return new ProblemResult(401, "Invalid access token.");
+            return new ProblemResult(401, Messages.Auth.InvalidAccessToken);
         }
 
         var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)
@@ -35,20 +36,20 @@ public class RefreshTokenHandle : IUseCaseHandle<RefreshTokenRequest, Result<Ref
 
         if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out var userId))
         {
-            return new ProblemResult(401, "Invalid access token.");
+            return new ProblemResult(401, Messages.Auth.InvalidAccessToken);
         }
 
         var storedToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
 
         if (storedToken is null || !storedToken.IsActive || storedToken.UserId != userId)
         {
-            return new ProblemResult(401, "Invalid or expired refresh token.");
+            return new ProblemResult(401, Messages.Auth.InvalidOrExpiredRefreshToken);
         }
 
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
-            return new ProblemResult(401, "User not found.");
+            return new ProblemResult(401, Messages.Auth.UserNotFound);
         }
 
         await _refreshTokenRepository.RevokeAsync(storedToken, cancellationToken);

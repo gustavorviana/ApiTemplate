@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using ApiTemplate.Application.Core.Entities;
+using System.Security.Claims;
 
 namespace ApiTemplate.Application.Interfaces;
 

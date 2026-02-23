@@ -1,4 +1,5 @@
 using ApiTemplate.Application.Interfaces;
+using ApiTemplate.Application.MessagesCatalog;
 using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases.Auth.Login;
@@ -27,7 +28,7 @@ public class LoginHandle : IUseCaseHandle<LoginRequest, Result<LoginResponse>>
 
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            return new ProblemResult(401, "Invalid email or password.");
+            return new ProblemResult(401, Messages.Auth.InvalidEmailOrPassword);
         }
 
         var accessToken = _jwtService.GenerateAccessToken(user);
