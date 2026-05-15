@@ -1,6 +1,6 @@
-using ApiTemplate.Application.Core.Enums;
+using ApiTemplate.Domain.Enums;
 
-namespace ApiTemplate.Application.Core.ValueObjects;
+namespace ApiTemplate.Domain.ValueObjects;
 
 public sealed class PasswordStrengthResult
 {

@@ -6,7 +6,7 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
     <PackageVersion Include="MockQueryable.NSubstitute" Version="10.0.2" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.4" />
@@ -33,25 +33,31 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.12.0" />
   </ItemGroup>
-  <!--#if (UseDatabase) -->
+  <PropertyGroup>
+    <!--#if (UseMySQL) -->
+    <!-- Pomelo.EntityFrameworkCore.MySql ainda nao tem release estavel para EF Core 10. -->
+    <EFCoreVersion>9.0.9</EFCoreVersion>
+    <!--#else -->
+    <EFCoreVersion>10.0.8</EFCoreVersion>
+    <!--#endif -->
+  </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EFCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EFCoreVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EFCoreVersion)" />
   </ItemGroup>
   <!--#if (UseSqlServer) -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EFCoreVersion)" />
   </ItemGroup>
   <!--#elif (UsePostgres) -->
   <ItemGroup>
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>
   <!--#elif (UseMySQL) -->
   <ItemGroup>
     <PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
   </ItemGroup>
-  <!--#endif -->
   <!--#endif -->
   <ItemGroup>
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />

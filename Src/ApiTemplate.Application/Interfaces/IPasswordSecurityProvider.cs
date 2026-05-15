@@ -6,4 +6,3 @@ public interface IPasswordSecurityProvider
 {
     PasswordStrengthResult Evaluate(string password);
 }
-

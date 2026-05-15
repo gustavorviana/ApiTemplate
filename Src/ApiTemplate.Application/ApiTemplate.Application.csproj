@@ -5,12 +5,19 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
+		<!--#if (!UseDomainProject) -->
 		<Folder Include="Core\Entities\" />
 		<Folder Include="Core\Events\" />
 		<Folder Include="Core\Enums\" />
 		<Folder Include="Core\ValueObjects\" />
+		<!--#endif -->
 		<Folder Include="Interfaces\" />
 	</ItemGroup>
+	<!--#if (UseDomainProject) -->
+	<ItemGroup>
+		<ProjectReference Include="..\ApiTemplate.Domain\ApiTemplate.Domain.csproj" />
+	</ItemGroup>
+	<!--#endif -->
 	<!--#if (UseValidation) -->
 	<ItemGroup>
 		<PackageReference Include="FluentValidation" />
@@ -19,11 +26,9 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
 	</ItemGroup>
-	<!--#if (UseDatabase) -->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" />
 	</ItemGroup>
-	<!--#endif -->
 	<ItemGroup>
 		<PackageReference Include="Viana.Results" />
 	</ItemGroup>

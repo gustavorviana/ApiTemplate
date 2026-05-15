@@ -1,6 +1,10 @@
 using ApiTemplate.Api.DependencyInjection;
+#if (EnableRateLimiting)
 using ApiTemplate.Api.Extensions;
+#endif
+#if (UseValidation)
 using ApiTemplate.Api.Filters;
+#endif
 using Viana.Results.Mvc;
 using Viana.Results.Mvc.Filters;
 using ApiTemplate.Infrastructure.DependencyInjection;
@@ -19,7 +23,7 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<VianaResultFilter>();
 }).AddVianaResultFilter();
 
-#if (EnableJwtWithDatabase)
+#if (EnableJwt)
 builder.Services.AddJwtAuthentication(builder.Configuration);
 #endif
 
@@ -30,7 +34,7 @@ builder.AddCustomRateLimiting();
 
 var app = builder.Build();
 
-#if (UseDatabase && RunMigrationsOnStartup)
+#if (RunMigrationsOnStartup)
 await DatabaseMigrationRunner.RunMigrationsAsync(app.Services);
 #endif
 
@@ -44,7 +48,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-#if (EnableJwtWithDatabase)
+#if (EnableJwt)
 app.UseJwtAuthentication();
 #endif
 

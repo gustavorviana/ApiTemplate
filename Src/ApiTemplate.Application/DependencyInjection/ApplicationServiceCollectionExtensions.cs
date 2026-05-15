@@ -14,21 +14,17 @@ public static class ApplicationServiceCollectionExtensions
 
     private static void RegisterUseCases(IServiceCollection services)
     {
-        var useCaseOpenType = typeof(IUseCaseHandle<,>);
+        var useCaseOpenType = typeof(IUseCaseHandler<,>);
         var types = GetLoadableTypes(typeof(ApplicationServiceCollectionExtensions).Assembly);
 
         foreach (var type in types)
         {
-            if (!IsConcrete(type))
-                continue;
+            if (!IsConcrete(type)) continue;
 
-            var interfaces = type
-                .GetInterfaces()
-                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == useCaseOpenType)
-                .ToArray();
+            var implementsHandler = type.GetInterfaces()
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == useCaseOpenType);
 
-            if (interfaces.Length == 0)
-                continue;
+            if (!implementsHandler) continue;
 
             services.AddScoped(type);
         }

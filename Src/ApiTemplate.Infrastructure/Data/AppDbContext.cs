@@ -8,7 +8,7 @@ public class AppDbContext : DbContext, IDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-#if (EnableJwtWithDatabase)
+#if (EnableJwt)
     public DbSet<User> Users => Set<User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 #endif

@@ -1,11 +1,11 @@
-#if (UseDatabase)
+#if (UseValidation)
 using ApiTemplate.Application.Validation;
 using FluentValidation.Results;
 #endif
 
 namespace ApiTemplate.Application.UseCases.Auth.Login;
 
-#if (UseDatabase)
+#if (UseValidation)
 public class LoginRequest : IValidatableRequest
 #else
 public class LoginRequest
@@ -14,7 +14,7 @@ public class LoginRequest
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
 
-#if (UseDatabase)
+#if (UseValidation)
     public ValidationResult Validate() =>
         new LoginRequestValidator().Validate(this);
 #endif

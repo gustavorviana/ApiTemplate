@@ -1,6 +1,6 @@
-using ApiTemplate.Application.Core.Enums;
+using ApiTemplate.Domain.Enums;
 
-namespace ApiTemplate.Application.Core.Options;
+namespace ApiTemplate.Domain.Options;
 
 public sealed class PasswordSecurityOptions
 {

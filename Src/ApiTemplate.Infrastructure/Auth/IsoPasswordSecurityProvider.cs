@@ -1,19 +1,22 @@
+using System.Text;
 using ApiTemplate.Application.Core.Enums;
 using ApiTemplate.Application.Core.Options;
 using ApiTemplate.Application.Core.ValueObjects;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Infrastructure.MessagesCatalog;
-using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace ApiTemplate.Infrastructure.Auth;
 
+// ISO/IEC 27001 baseline. The acceptable minimum strength is configurable
+// via PasswordSecurityOptions.MinimumStrength.
 public sealed class IsoPasswordSecurityProvider : IPasswordSecurityProvider
 {
     private readonly PasswordSecurityOptions _options;
 
-    public IsoPasswordSecurityProvider(PasswordSecurityOptions options)
+    public IsoPasswordSecurityProvider(IOptions<PasswordSecurityOptions> options)
     {
-        _options = options;
+        _options = options.Value;
     }
 
     public PasswordStrengthResult Evaluate(string password)
@@ -48,7 +51,7 @@ public sealed class IsoPasswordSecurityProvider : IPasswordSecurityProvider
             };
         }
 
-        var missing = BuildMissingRequirementsForMinimum(
+        var missing = BuildMissingRequirements(
             minimumRequired,
             length,
             hasLower,
@@ -72,41 +75,15 @@ public sealed class IsoPasswordSecurityProvider : IPasswordSecurityProvider
         bool hasSymbol)
     {
         if (length < 8)
-        {
             return PasswordStrengthStatus.Unacceptable;
-        }
 
         var score = 0;
-
-        if (length >= 12)
-        {
-            score++;
-        }
-
-        if (length >= 14)
-        {
-            score++;
-        }
-
-        if (hasLower)
-        {
-            score++;
-        }
-
-        if (hasUpper)
-        {
-            score++;
-        }
-
-        if (hasDigit)
-        {
-            score++;
-        }
-
-        if (hasSymbol)
-        {
-            score++;
-        }
+        if (length >= 12) score++;
+        if (length >= 14) score++;
+        if (hasLower) score++;
+        if (hasUpper) score++;
+        if (hasDigit) score++;
+        if (hasSymbol) score++;
 
         return score switch
         {
@@ -118,7 +95,7 @@ public sealed class IsoPasswordSecurityProvider : IPasswordSecurityProvider
         };
     }
 
-    private static string BuildMissingRequirementsForMinimum(
+    private static string BuildMissingRequirements(
         PasswordStrengthStatus minimum,
         int length,
         bool hasLower,
@@ -128,58 +105,41 @@ public sealed class IsoPasswordSecurityProvider : IPasswordSecurityProvider
     {
         var builder = new StringBuilder();
 
-        void AppendRequirement(string text)
+        void Append(string text)
         {
-            if (builder.Length > 0)
-            {
-                builder.Append(' ');
-            }
-
+            if (builder.Length > 0) builder.Append(' ');
             builder.Append(text);
         }
 
         if (minimum >= PasswordStrengthStatus.VeryWeak && length < 10)
-        {
-            AppendRequirement(Messages.PasswordSecurityMessages.PasswordAtLeast10Chars);
-        }
+            Append(Messages.PasswordSecurityMessages.PasswordAtLeast10Chars);
 
         if (minimum >= PasswordStrengthStatus.Medium && length < 12)
-        {
-            AppendRequirement(Messages.PasswordSecurityMessages.PasswordAtLeast12Chars);
-        }
+            Append(Messages.PasswordSecurityMessages.PasswordAtLeast12Chars);
 
         if (minimum >= PasswordStrengthStatus.Strong && length < 14)
-        {
-            AppendRequirement(Messages.PasswordSecurityMessages.PasswordAtLeast14Chars);
-        }
+            Append(Messages.PasswordSecurityMessages.PasswordAtLeast14Chars);
 
         var categoryCount = (hasLower ? 1 : 0)
-                            + (hasUpper ? 1 : 0)
-                            + (hasDigit ? 1 : 0)
-                            + (hasSymbol ? 1 : 0);
+                          + (hasUpper ? 1 : 0)
+                          + (hasDigit ? 1 : 0)
+                          + (hasSymbol ? 1 : 0);
 
         if (minimum >= PasswordStrengthStatus.Medium && categoryCount < 3)
-        {
-            AppendRequirement(Messages.PasswordSecurityMessages.PasswordMustContainThreeCategories);
-        }
+            Append(Messages.PasswordSecurityMessages.PasswordMustContainThreeCategories);
 
         if (minimum >= PasswordStrengthStatus.Strong && (!hasDigit || !hasSymbol))
         {
-            AppendRequirement(Messages.PasswordSecurityMessages.PasswordMustContainDigit);
-            AppendRequirement(Messages.PasswordSecurityMessages.PasswordMustContainSymbol);
+            Append(Messages.PasswordSecurityMessages.PasswordMustContainDigit);
+            Append(Messages.PasswordSecurityMessages.PasswordMustContainSymbol);
         }
 
         if (minimum >= PasswordStrengthStatus.VeryStrong && categoryCount < 4)
-        {
-            AppendRequirement(Messages.PasswordSecurityMessages.PasswordMustContainAllCategories);
-        }
+            Append(Messages.PasswordSecurityMessages.PasswordMustContainAllCategories);
 
         if (builder.Length == 0)
-        {
-            AppendRequirement(Messages.PasswordSecurityMessages.PasswordBelowMinimum);
-        }
+            Append(Messages.PasswordSecurityMessages.PasswordBelowMinimum);
 
         return builder.ToString();
     }
 }
-

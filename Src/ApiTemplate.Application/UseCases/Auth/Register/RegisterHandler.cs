@@ -2,23 +2,28 @@ using Viana.Results;
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.MessagesCatalog;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiTemplate.Application.UseCases.Auth.Register;
 
-public class RegisterHandle(
-    IUserRepository userRepository,
+public class RegisterHandler(
+    IDbContext db,
+#if (EnablePasswordSecurity)
     IPasswordSecurityProvider passwordSecurityProvider,
-    IPasswordHasher passwordHasher) : IUseCaseHandle<RegisterRequest, Result<RegisterResponse>>
+#endif
+    IPasswordHasher passwordHasher) : IUseCaseHandler<RegisterRequest, Result<RegisterResponse>>
 {
     public async Task<Result<RegisterResponse>> ExecuteAsync(
         RegisterRequest request,
         CancellationToken cancellationToken = default)
     {
-        var existing = await userRepository.GetByEmailAsync(request.Email, cancellationToken);
+        var existing = await db.Users
+            .AnyAsync(u => u.Email == request.Email, cancellationToken);
 
-        if (existing is not null)
+        if (existing)
             return new ProblemResult(409, Messages.Auth.UserWithEmailAlreadyExists);
 
+#if (EnablePasswordSecurity)
         var strengthResult = passwordSecurityProvider.Evaluate(request.Password);
 
         if (!strengthResult.MeetsMinimum)
@@ -29,10 +34,13 @@ public class RegisterHandle(
 
             return new ProblemResult(400, message);
         }
+#endif
 
         var passwordHash = passwordHasher.Hash(request.Password);
         var user = User.Create(request.Name, request.Email, passwordHash);
-        await userRepository.AddAsync(user, cancellationToken);
+
+        db.Users.Add(user);
+        await db.SaveChangesAsync(cancellationToken);
 
         var response = new RegisterResponse
         {

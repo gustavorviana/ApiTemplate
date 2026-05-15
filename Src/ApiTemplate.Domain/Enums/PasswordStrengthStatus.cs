@@ -1,4 +1,4 @@
-namespace ApiTemplate.Application.Core.Enums;
+namespace ApiTemplate.Domain.Enums;
 
 public enum PasswordStrengthStatus
 {

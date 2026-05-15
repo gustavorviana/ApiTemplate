@@ -31,21 +31,17 @@
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
 	</ItemGroup>
 	<!--#endif -->
-	<!--#if (UseDatabase) -->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools"/>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
 	</ItemGroup>
-	<!--#endif -->
 
-	<!--#if (UseDatabase) -->
 	<ItemGroup>
 		<Folder Include="Data\Configurations\" />
 		<Folder Include="Data\Migrations\" />
 		<Folder Include="Data\Seeders\" />
 		<Folder Include="Data\Repositories\" />
 	</ItemGroup>
-	<!--#endif -->
 
 	<ItemGroup>
 		<ProjectReference Include="..\ApiTemplate.Application\ApiTemplate.Application.csproj" />
