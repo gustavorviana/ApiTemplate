@@ -11,6 +11,8 @@ cd MyApi
 dotnet run --project Src/MyApi.AppHost
 ```
 
+> **Creating from Visual Studio?** Check the **"Place solution and project in the same directory"** option in the New Project wizard. The template is already a multi-project solution with its own `Src/` and `Tests/` layout — if that option is left unchecked, VS wraps everything in an extra `ProjectName/ProjectName/...` folder.
+
 ## What you get
 
 - **`Src/MyApi.Api`** — controllers, filters, DI wiring, Swagger, JWT bearer.
