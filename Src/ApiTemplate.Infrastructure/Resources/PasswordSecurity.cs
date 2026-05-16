@@ -4,7 +4,14 @@ public static partial class Messages
 {
     public static class PasswordSecurityMessages
     {
-        public const string PasswordCannotBeEmpty = "Password cannot be empty.";
+        public const string PasswordCannotBeEmpty =
+            "Password cannot be empty.";
+
+        public const string PasswordAtLeast6Chars =
+            "Password must be at least 6 characters long.";
+
+        public const string PasswordAtLeast8Chars =
+            "Password must be at least 8 characters long.";
 
         public const string PasswordAtLeast10Chars =
             "Password must be at least 10 characters long.";
@@ -20,6 +27,9 @@ public static partial class Messages
 
         public const string PasswordMustContainSymbol =
             "Password must contain at least one non-alphanumeric character.";
+
+        public const string PasswordMustContainTwoCategories =
+            "Password must contain characters from at least two categories: lowercase, uppercase, digits, symbols.";
 
         public const string PasswordMustContainThreeCategories =
             "Password must contain characters from at least three categories: lowercase, uppercase, digits, symbols.";

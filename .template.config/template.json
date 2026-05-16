@@ -252,7 +252,7 @@
             "**/Src/ApiTemplate.Domain/Enums/PasswordStrengthStatus.cs",
             "**/Src/ApiTemplate.Domain/Options/PasswordSecurityOptions.cs",
             "**/Src/ApiTemplate.Domain/ValueObjects/PasswordStrengthResult.cs",
-            "**/Src/ApiTemplate.Infrastructure/Auth/IsoPasswordSecurityProvider.cs",
+            "**/Src/ApiTemplate.Infrastructure/Auth/PasswordSecurityProvider.cs",
             "**/Src/ApiTemplate.Infrastructure/Resources/PasswordSecurity.cs"
           ]
         },

@@ -50,7 +50,7 @@ public static class InfrastructureServiceCollectionExtensions
             .Bind(configuration.GetSection(PasswordSecurityOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        services.AddSingleton<IPasswordSecurityProvider, IsoPasswordSecurityProvider>();
+        services.AddSingleton<IPasswordSecurityProvider, PasswordSecurityProvider>();
 #endif
 
         services.AddSingleton<IJwtService, JwtService>();

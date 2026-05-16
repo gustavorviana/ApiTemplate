@@ -8,13 +8,11 @@ using Microsoft.Extensions.Options;
 
 namespace ApiTemplate.Infrastructure.Auth;
 
-// ISO/IEC 27001 baseline. The acceptable minimum strength is configurable
-// via PasswordSecurityOptions.MinimumStrength.
-public sealed class IsoPasswordSecurityProvider : IPasswordSecurityProvider
+public sealed class PasswordSecurityProvider : IPasswordSecurityProvider
 {
     private readonly PasswordSecurityOptions _options;
 
-    public IsoPasswordSecurityProvider(IOptions<PasswordSecurityOptions> options)
+    public PasswordSecurityProvider(IOptions<PasswordSecurityOptions> options)
     {
         _options = options.Value;
     }
@@ -107,38 +105,58 @@ public sealed class IsoPasswordSecurityProvider : IPasswordSecurityProvider
 
         void Append(string text)
         {
-            if (builder.Length > 0) builder.Append(' ');
+            if (builder.Length > 0)
+                builder.Append(' ');
+
             builder.Append(text);
         }
 
-        if (minimum >= PasswordStrengthStatus.VeryWeak && length < 10)
-            Append(Messages.PasswordSecurityMessages.PasswordAtLeast10Chars);
+        var minimumLength = minimum switch
+        {
+            PasswordStrengthStatus.Unacceptable => 0,
+            PasswordStrengthStatus.VeryWeak => 6,
+            PasswordStrengthStatus.Weak => 8,
+            PasswordStrengthStatus.Medium => 10,
+            PasswordStrengthStatus.Strong => 12,
+            PasswordStrengthStatus.VeryStrong => 14,
+            _ => 6
+        };
 
-        if (minimum >= PasswordStrengthStatus.Medium && length < 12)
-            Append(Messages.PasswordSecurityMessages.PasswordAtLeast12Chars);
-
-        if (minimum >= PasswordStrengthStatus.Strong && length < 14)
-            Append(Messages.PasswordSecurityMessages.PasswordAtLeast14Chars);
+        if (length < minimumLength)
+        {
+            Append(minimumLength switch
+            {
+                6 => Messages.PasswordSecurityMessages.PasswordAtLeast6Chars,
+                8 => Messages.PasswordSecurityMessages.PasswordAtLeast8Chars,
+                10 => Messages.PasswordSecurityMessages.PasswordAtLeast10Chars,
+                12 => Messages.PasswordSecurityMessages.PasswordAtLeast12Chars,
+                14 => Messages.PasswordSecurityMessages.PasswordAtLeast14Chars,
+                _ => Messages.PasswordSecurityMessages.PasswordBelowMinimum
+            });
+        }
 
         var categoryCount = (hasLower ? 1 : 0)
                           + (hasUpper ? 1 : 0)
                           + (hasDigit ? 1 : 0)
                           + (hasSymbol ? 1 : 0);
 
+        if (minimum >= PasswordStrengthStatus.Weak && categoryCount < 2)
+            Append(Messages.PasswordSecurityMessages.PasswordMustContainTwoCategories);
+
         if (minimum >= PasswordStrengthStatus.Medium && categoryCount < 3)
             Append(Messages.PasswordSecurityMessages.PasswordMustContainThreeCategories);
 
-        if (minimum >= PasswordStrengthStatus.Strong && (!hasDigit || !hasSymbol))
+        if (minimum >= PasswordStrengthStatus.Strong)
         {
-            Append(Messages.PasswordSecurityMessages.PasswordMustContainDigit);
-            Append(Messages.PasswordSecurityMessages.PasswordMustContainSymbol);
+            if (!hasDigit)
+                Append(Messages.PasswordSecurityMessages.PasswordMustContainDigit);
+
+            if (!hasSymbol)
+                Append(Messages.PasswordSecurityMessages.PasswordMustContainSymbol);
         }
 
         if (minimum >= PasswordStrengthStatus.VeryStrong && categoryCount < 4)
             Append(Messages.PasswordSecurityMessages.PasswordMustContainAllCategories);
-
-        if (builder.Length == 0)
-            Append(Messages.PasswordSecurityMessages.PasswordBelowMinimum);
 
         return builder.ToString();
     }
