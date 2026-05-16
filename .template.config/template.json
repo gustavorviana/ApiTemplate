@@ -93,6 +93,10 @@
         {
           "choice": "scalar",
           "description": "Microsoft.AspNetCore.OpenApi + Viana.Results.OpenApi transformers, UI rendered by Scalar.AspNetCore."
+        },
+        {
+          "choice": "none",
+          "description": "No OpenAPI/Swagger documentation."
         }
       ]
     },
@@ -103,6 +107,10 @@
     "UseScalar": {
       "type": "computed",
       "value": "(OpenApiProvider == \"scalar\")"
+    },
+    "UseOpenApi": {
+      "type": "computed",
+      "value": "(OpenApiProvider != \"none\")"
     },
     "DbContextName": {
       "type": "parameter",

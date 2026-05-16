@@ -8,7 +8,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+		<!--#if (UseOpenApi) -->
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+		<!--#endif -->
 		<!--#if (UseSwashbuckle) -->
 		<PackageReference Include="Swashbuckle.AspNetCore" />
 		<!--#endif -->
@@ -30,7 +32,7 @@
 		<PackageReference Include="Viana.Results.Mvc" />
 		<!--#if (UseSwashbuckle) -->
 		<PackageReference Include="Viana.Results.OpenApi.Swashbuckle" />
-		<!--#else -->
+		<!--#elif (UseScalar) -->
 		<PackageReference Include="Viana.Results.OpenApi" />
 		<PackageReference Include="Scalar.AspNetCore" />
 		<!--#endif -->

@@ -88,4 +88,18 @@ public static class RateLimitingExtensions
 
 		return builder;
 	}
+
+	public static WebApplication UseCustomRateLimiting(this WebApplication app)
+	{
+		var enabled = app.Configuration
+			.GetSection(ConfigurationSectionName)
+			.GetValue<bool>("Enabled");
+
+		if (enabled)
+		{
+			app.UseRateLimiter();
+		}
+
+		return app;
+	}
 }

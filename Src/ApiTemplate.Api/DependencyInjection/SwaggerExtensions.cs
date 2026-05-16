@@ -27,6 +27,9 @@ public static class SwaggerExtensions
 
     public static WebApplication UseOpenApiDocumentation(this WebApplication app)
     {
+        if (!app.Environment.IsDevelopment())
+            return app;
+
         app.UseSwagger();
         app.UseSwaggerUI();
         return app;

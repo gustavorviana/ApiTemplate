@@ -25,6 +25,9 @@ public static class ScalarExtensions
 
     public static WebApplication UseOpenApiDocumentation(this WebApplication app)
     {
+        if (!app.Environment.IsDevelopment())
+            return app;
+
         app.MapOpenApi();
         app.MapScalarApiReference();
         return app;
