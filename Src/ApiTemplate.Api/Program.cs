@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddHttpApplication();
+builder.Services.AddHttpApplication(builder.Configuration);
 builder.Services.AddApiServices();
 builder.Services.AddCorsServices(builder.Configuration);
 

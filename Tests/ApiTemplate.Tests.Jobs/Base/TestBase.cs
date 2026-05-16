@@ -8,13 +8,13 @@ namespace ApiTemplate.Tests.Jobs.Base;
 public abstract class TestBase
 {
     protected IAppDbContext AppContext { get; set; }
-    protected IAppDbContextFactory AppDbContextFactory { get; set; }
+    protected ISystemDbContextFactory SystemDbContextFactory { get; set; }
 
     protected TestBase()
     {
         AppContext = Substitute.For<IAppDbContext>();
-        AppDbContextFactory = Substitute.For<IAppDbContextFactory>();
-        AppDbContextFactory.Create().Returns(AppContext);
+        SystemDbContextFactory = Substitute.For<ISystemDbContextFactory>();
+        SystemDbContextFactory.Create().Returns(AppContext);
     }
 
     protected static DbSet<T> ToMockDbSet<T>(ICollection<T> data) where T : class

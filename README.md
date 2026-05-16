@@ -72,9 +72,31 @@ folder and it appears in DI.
 
 So handlers should **never** assign `CreatedAt` themselves.
 
-### 3. `IAppDbContextFactory` injects the current user into every context
+### 3. Two factories: `IAppDbContextFactory` (HTTP) vs `ISystemDbContextFactory` (system)
 
-Handlers depend on `IAppDbContextFactory`, not on `IAppDbContext` directly:
+The template exposes two `IAppDbContext` factories. They look identical on
+purpose — both have a single `Create()` method — but they encode a hard
+architectural rule into the type system:
+
+| Interface | Registered by | Consumed by | Sets `CurrentUserId`? |
+|---|---|---|---|
+| `IAppDbContextFactory` | API (`AddHttpApplication`) | HTTP use case handlers | Yes — reads `ICurrentUser` |
+| `ISystemDbContextFactory` | Infrastructure (`AddInfrastructure`) | Hangfire handlers, migrations, seed, startup tasks | No — context has no user |
+
+**Why two interfaces instead of one with optional user?** A single interface
+with a nullable `ICurrentUser` would fail silently — a Hangfire handler that
+forgot to register `ICurrentUser` would just write `NULL` to `CreatedByUserId`
+with no warning. With two interfaces:
+
+- A job handler that injects `IAppDbContextFactory` will **fail to resolve** in
+  the worker host (the factory is only registered by `AddHttpApplication`,
+  which the worker does not call). DI throws at startup — loud, immediate.
+- The choice between "this code runs in an HTTP request" vs "this code runs
+  in the background" is visible at the injection site and at the test site
+  (`Substitute.For<IAppDbContextFactory>()` vs
+  `Substitute.For<ISystemDbContextFactory>()`).
+
+**HTTP handler (the common case):**
 
 ```csharp
 public class CreateFooHandler(IAppDbContextFactory dbFactory) : ...
@@ -82,16 +104,31 @@ public class CreateFooHandler(IAppDbContextFactory dbFactory) : ...
     public async Task<...> ExecuteAsync(...)
     {
         await using var db = dbFactory.Create();
-        // ... db.CurrentUserId is already populated from the JWT
+        // db.CurrentUserId is already populated from the JWT (HttpCurrentUser
+        // reads NameIdentifier/sub from the ambient HttpContext) and the audit
+        // interceptor will stamp CreatedByUserId on every insert.
     }
 }
 ```
 
-`AppDbContextFactory` uses EF Core's `IDbContextFactory<AppDbContext>` to create
-fresh, disposable contexts and, when JWT is enabled, calls
-`ICurrentUser.UserId` (`HttpCurrentUser` reads `NameIdentifier`/`sub` from the
-ambient `HttpContext`) and copies the value onto the new context. That value
-flows into the audit logic above.
+**Background job (no HTTP context):**
+
+```csharp
+public sealed class ImportFooJob(ISystemDbContextFactory dbFactory) : IHandler<...>
+{
+    public async Task HandleAsync(FlowContext<...> context, CancellationToken ct)
+    {
+        await using var db = dbFactory.Create();
+        // db.CurrentUserId is null — audit fields will be NULL ("system action").
+        // If the job was triggered by a human and you want to preserve that,
+        // carry the user id in the event payload and set db.CurrentUserId
+        // explicitly before SaveChangesAsync.
+    }
+}
+```
+
+Both factories build on EF Core's `IDbContextFactory<AppDbContext>` to create
+fresh, disposable contexts per call — no shared state, no scoping accidents.
 
 ## Domain conventions
 

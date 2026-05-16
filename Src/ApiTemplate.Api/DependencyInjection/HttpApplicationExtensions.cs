@@ -3,6 +3,7 @@ using ApiTemplate.Application.UseCases;
 using ApiTemplate.Infrastructure.Data;
 #if (EnableJwt)
 using ApiTemplate.Infrastructure.Auth;
+using ApiTemplate.Infrastructure.DependencyInjection;
 #endif
 #if (UseValidation)
 using FluentValidation;
@@ -21,7 +22,7 @@ namespace ApiTemplate.Api.DependencyInjection;
 /// </summary>
 public static class HttpApplicationExtensions
 {
-    public static IServiceCollection AddHttpApplication(this IServiceCollection services)
+    public static IServiceCollection AddHttpApplication(this IServiceCollection services, IConfiguration configuration)
     {
         var applicationAssembly = typeof(IUseCaseHandler<,>).Assembly;
         var types = GetLoadableTypes(applicationAssembly);
@@ -32,6 +33,7 @@ public static class HttpApplicationExtensions
 #endif
 
 #if (EnableJwt)
+        services.AddAuthInfrastructure(configuration);
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, HttpCurrentUser>();
 #endif
