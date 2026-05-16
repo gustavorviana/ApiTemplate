@@ -36,8 +36,8 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
   </ItemGroup>
   <PropertyGroup>
-    <!--#if (UseMySQL) -->
-    <!-- Pomelo.EntityFrameworkCore.MySql ainda nao tem release estavel para EF Core 10. -->
+    <!--#if (UseMySqlPomelo) -->
+    <!-- Pomelo.EntityFrameworkCore.MySql does not have a stable release for EF Core 10 yet. -->
     <EFCoreVersion>9.0.9</EFCoreVersion>
     <!--#else -->
     <EFCoreVersion>10.0.8</EFCoreVersion>
@@ -56,9 +56,13 @@
   <ItemGroup>
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>
-  <!--#elif (UseMySQL) -->
+  <!--#elif (UseMySqlPomelo) -->
   <ItemGroup>
     <PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+  </ItemGroup>
+  <!--#elif (UseMySqlOracle) -->
+  <ItemGroup>
+    <PackageVersion Include="MySql.EntityFrameworkCore" Version="10.0.7" />
   </ItemGroup>
   <!--#endif -->
   <ItemGroup>

@@ -66,8 +66,10 @@ public static class ApiServiceCollectionExtensions
             options.UseSqlServer(connectionString);
 #elif (UsePostgres)
             options.UseNpgsql(connectionString);
-#elif (UseMySQL)
+#elif (UseMySqlPomelo)
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+#elif (UseMySqlOracle)
+            options.UseMySQL(connectionString);
 #endif
         });
 

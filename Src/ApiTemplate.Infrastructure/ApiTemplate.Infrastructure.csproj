@@ -27,9 +27,14 @@
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
 	</ItemGroup>
 	<!--#endif -->
-	<!--#if (UseMySQL) -->
+	<!--#if (UseMySqlPomelo) -->
 	<ItemGroup>
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
+	</ItemGroup>
+	<!--#endif -->
+	<!--#if (UseMySqlOracle) -->
+	<ItemGroup>
+		<PackageReference Include="MySql.EntityFrameworkCore" />
 	</ItemGroup>
 	<!--#endif -->
 	<ItemGroup>

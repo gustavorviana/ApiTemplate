@@ -37,8 +37,12 @@
           "description": "PostgreSQL (Npgsql.EntityFrameworkCore.PostgreSQL)"
         },
         {
-          "choice": "mysql",
-          "description": "MySQL (Pomelo.EntityFrameworkCore.MySql)"
+          "choice": "mysql-pomelo",
+          "description": "MySQL via Pomelo connector (Pomelo.EntityFrameworkCore.MySql). Locked to EF Core 9.x until Pomelo ships EF Core 10."
+        },
+        {
+          "choice": "mysql-oracle",
+          "description": "MySQL via Oracle connector (MySql.EntityFrameworkCore). Supports EF Core 10."
         }
       ]
     },
@@ -50,9 +54,17 @@
       "type": "computed",
       "value": "(DatabaseProvider == \"postgres\")"
     },
+    "UseMySqlPomelo": {
+      "type": "computed",
+      "value": "(DatabaseProvider == \"mysql-pomelo\")"
+    },
+    "UseMySqlOracle": {
+      "type": "computed",
+      "value": "(DatabaseProvider == \"mysql-oracle\")"
+    },
     "UseMySQL": {
       "type": "computed",
-      "value": "(DatabaseProvider == \"mysql\")"
+      "value": "(UseMySqlPomelo || UseMySqlOracle)"
     },
     "RunMigrationsOnStartup": {
       "type": "parameter",
