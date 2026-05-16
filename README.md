@@ -193,6 +193,28 @@ every push/PR via `.github/workflows/validate.yml`.
 
 Bump in one place.
 
+## Hangfire (`--EnableHangfire true`)
+
+When enabled, an extra runner project `Src/MyApi.Jobs` is generated. It hosts
+the Hangfire server and dashboard, consumes events published from the API
+through the `ExecutionFlow` abstraction, and uses a separate database
+(`ConnectionStrings:Hangfire`) provisioned by Aspire alongside the app DB.
+
+> **Security warning — dashboard has no auth.** `app.UseHangfireDashboard("")`
+> serves the dashboard at the runner's root with anonymous access. **Bind it to
+> localhost only and do not expose it publicly.** Before running outside dev,
+> wire an `IDashboardAuthorizationFilter` (JWT bearer / admin role / IP allowlist)
+> and configure the URL accordingly.
+
+Topology:
+
+- **`Src/MyApi.Contracts`** — POCO event classes shared between producer and
+  consumer. Both Api and Jobs reference it; neither references the other.
+- **`Src/MyApi.Api`** — producer. Adds `AddExecutionFlowDispatcher()` so use
+  cases can inject `IEventDispatcher` and publish events on the queue.
+- **`Src/MyApi.Jobs`** — consumer. Hosts `AddHangfireServer()` and the
+  dashboard, registers handlers via `AddHangfireToExecutionFlow(scan)`.
+
 ## License
 
 MIT. See `LICENSE.txt`.

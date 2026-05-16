@@ -3,24 +3,20 @@ using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Core.ValueObjects;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.UseCases.Auth.Login;
-using MockQueryable.NSubstitute;
+using ApiTemplate.Tests.Application.Base;
 using NSubstitute;
 
 namespace ApiTemplate.Tests.Application.UseCases.Auth.Login;
 
-public class LoginHandlerTests
+public class LoginHandlerTests : TestBase
 {
-    private static IAppDbContextFactory NewFactory(IEnumerable<UserEntity>? users = null, IEnumerable<RefreshTokenEntity>? tokens = null)
-    {
-        var usersSet = (users ?? new List<UserEntity>()).ToList().BuildMockDbSet();
-        var tokensSet = (tokens ?? new List<RefreshTokenEntity>()).ToList().BuildMockDbSet();
-        var db = Substitute.For<IAppDbContext>();
-        db.Users.Returns(usersSet);
-        db.RefreshTokens.Returns(tokensSet);
+    private readonly IJwtService _jwtService = Substitute.For<IJwtService>();
+    private readonly IPasswordHasher _passwordHasher = Substitute.For<IPasswordHasher>();
+    private readonly LoginHandler _handler;
 
-        var factory = Substitute.For<IAppDbContextFactory>();
-        factory.Create().Returns(db);
-        return factory;
+    public LoginHandlerTests()
+    {
+        _handler = new LoginHandler(AppDbContextFactory, _jwtService, _passwordHasher);
     }
 
     private static UserEntity NewUser(string email = "user@example.com", string hash = "stored-hash") =>
@@ -35,10 +31,12 @@ public class LoginHandlerTests
     [Fact]
     public async Task ExecuteAsync_ShouldReturnUnauthorized_WhenUserNotFound()
     {
-        var factory = NewFactory();
-        var handler = new LoginHandler(factory, Substitute.For<IJwtService>(), Substitute.For<IPasswordHasher>());
+        var usersDbSet = ToMockDbSet(Array.Empty<UserEntity>());
+        var tokensDbSet = ToMockDbSet(Array.Empty<RefreshTokenEntity>());
+        AppContext.Users.Returns(usersDbSet);
+        AppContext.RefreshTokens.Returns(tokensDbSet);
 
-        var result = await handler.ExecuteAsync(
+        var result = await _handler.ExecuteAsync(
             new LoginRequest { Email = "user@example.com", Password = "password" },
             CancellationToken.None);
 
@@ -49,14 +47,13 @@ public class LoginHandlerTests
     public async Task ExecuteAsync_ShouldReturnUnauthorized_WhenPasswordDoesNotMatch()
     {
         var user = NewUser();
-        var factory = NewFactory(users: new[] { user });
+        var usersDbSet = ToMockDbSet(new[] { user });
+        var tokensDbSet = ToMockDbSet(Array.Empty<RefreshTokenEntity>());
+        AppContext.Users.Returns(usersDbSet);
+        AppContext.RefreshTokens.Returns(tokensDbSet);
+        _passwordHasher.Verify(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
-        var passwordHasher = Substitute.For<IPasswordHasher>();
-        passwordHasher.Verify(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
-
-        var handler = new LoginHandler(factory, Substitute.For<IJwtService>(), passwordHasher);
-
-        var result = await handler.ExecuteAsync(
+        var result = await _handler.ExecuteAsync(
             new LoginRequest { Email = user.Email, Password = "wrong" },
             CancellationToken.None);
 
@@ -67,11 +64,12 @@ public class LoginHandlerTests
     public async Task ExecuteAsync_ShouldCreateTokens_WhenCredentialsAreValid()
     {
         var user = NewUser(hash: "hashed-password");
-        var factory = NewFactory(users: new[] { user });
+        var usersDbSet = ToMockDbSet(new[] { user });
+        var tokensDbSet = ToMockDbSet(Array.Empty<RefreshTokenEntity>());
+        AppContext.Users.Returns(usersDbSet);
+        AppContext.RefreshTokens.Returns(tokensDbSet);
 
-        var jwtService = Substitute.For<IJwtService>();
-        jwtService.GenerateAccessToken(Arg.Any<JwtClaimsContext>()).Returns("access-token");
-
+        _jwtService.GenerateAccessToken(Arg.Any<JwtClaimsContext>()).Returns("access-token");
         var refreshToken = new RefreshTokenEntity
         {
             Id = Guid.NewGuid(),
@@ -79,14 +77,10 @@ public class LoginHandlerTests
             Token = "refresh-token",
             ExpiresAt = DateTime.UtcNow.AddDays(7)
         };
-        jwtService.GenerateRefreshToken(user.Id).Returns(refreshToken);
+        _jwtService.GenerateRefreshToken(user.Id).Returns(refreshToken);
+        _passwordHasher.Verify("password", "hashed-password").Returns(true);
 
-        var passwordHasher = Substitute.For<IPasswordHasher>();
-        passwordHasher.Verify("password", "hashed-password").Returns(true);
-
-        var handler = new LoginHandler(factory, jwtService, passwordHasher);
-
-        var result = await handler.ExecuteAsync(
+        var result = await _handler.ExecuteAsync(
             new LoginRequest { Email = user.Email, Password = "password" },
             CancellationToken.None);
 

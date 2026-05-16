@@ -1,6 +1,6 @@
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
-using ApiTemplate.Application.MessagesCatalog;
+using ApiTemplate.Application.Resources;
 using Microsoft.EntityFrameworkCore;
 using Viana.Results;
 

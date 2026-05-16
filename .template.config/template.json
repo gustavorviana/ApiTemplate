@@ -72,6 +72,12 @@
       "defaultValue": "false",
       "description": "Run EF Core migrations when the application starts."
     },
+    "EnableDbResilience": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Wraps EF Core provider with EnableRetryOnFailure to recover from transient DB errors (SqlServer/Postgres/Pomelo MySQL). Oracle MySQL connector does not support this yet."
+    },
     "EnableJwt": {
       "type": "parameter",
       "datatype": "bool",
@@ -91,6 +97,12 @@
       "datatype": "bool",
       "defaultValue": "true",
       "description": "Enables rate limiting configuration and RateLimiting extensions."
+    },
+    "EnableHangfire": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Enables Hangfire background jobs through the ExecutionFlow handler abstraction (gustavorviana/ExecutionFlow). Adds an ApiTemplate.Jobs project for handlers and an ApiTemplate.Tests.Jobs project for their tests."
     },
     "OpenApiProvider": {
       "type": "parameter",
@@ -193,7 +205,7 @@
         {
           "condition": "(!UseValidation)",
           "exclude": [
-            "**/Src/ApiTemplate.Application/MessagesCatalog/Validation.cs",
+            "**/Src/ApiTemplate.Application/Resources/Validation.cs",
             "**/Src/ApiTemplate.Application/UseCases/Auth/Login/LoginRequestValidator.cs",
             "**/Src/ApiTemplate.Application/UseCases/Auth/Register/RegisterRequestValidator.cs",
             "**/Src/ApiTemplate.Application/UseCases/WeatherForecasts/Create/CreateWeatherForecastRequestValidator.cs",
@@ -217,9 +229,9 @@
             "**/Src/ApiTemplate.Application/Core/Enums/PasswordStrengthStatus.cs",
             "**/Src/ApiTemplate.Application/Core/Options/PasswordSecurityOptions.cs",
             "**/Src/ApiTemplate.Application/Core/ValueObjects/PasswordStrengthResult.cs",
-            "**/Src/ApiTemplate.Application/MessagesCatalog/Auth.cs",
+            "**/Src/ApiTemplate.Application/Resources/Auth.cs",
             "**/Src/ApiTemplate.Infrastructure/Auth/**",
-            "**/Src/ApiTemplate.Infrastructure/MessagesCatalog/PasswordSecurity.cs",
+            "**/Src/ApiTemplate.Infrastructure/Resources/PasswordSecurity.cs",
             "**/Src/ApiTemplate.Domain/Entities/UserEntity.cs",
             "**/Src/ApiTemplate.Domain/Entities/RefreshTokenEntity.cs",
             "**/Src/ApiTemplate.Domain/Enums/PasswordStrengthStatus.cs",
@@ -241,7 +253,7 @@
             "**/Src/ApiTemplate.Domain/Options/PasswordSecurityOptions.cs",
             "**/Src/ApiTemplate.Domain/ValueObjects/PasswordStrengthResult.cs",
             "**/Src/ApiTemplate.Infrastructure/Auth/IsoPasswordSecurityProvider.cs",
-            "**/Src/ApiTemplate.Infrastructure/MessagesCatalog/PasswordSecurity.cs"
+            "**/Src/ApiTemplate.Infrastructure/Resources/PasswordSecurity.cs"
           ]
         },
         {
@@ -249,6 +261,15 @@
           "exclude": [
             "**/Src/ApiTemplate.Api/Extensions/RateLimitingExtensions.cs",
             "**/Src/ApiTemplate.Api/Configuration/RateLimitingOptions.cs"
+          ]
+        },
+        {
+          "condition": "(!EnableHangfire)",
+          "exclude": [
+            "**/Src/ApiTemplate.Jobs/**",
+            "**/Src/ApiTemplate.Contracts/**",
+            "**/Tests/ApiTemplate.Tests.Jobs/**",
+            "**/Src/ApiTemplate.Api/DependencyInjection/HangfireProducerExtensions.cs"
           ]
         },
         {

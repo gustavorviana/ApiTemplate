@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ExecutionFlow.Hangfire.DependencyInjection" />
+		<PackageReference Include="ExecutionFlow.Hangfire.Console" />
+		<PackageReference Include="AspNetCore.HealthChecks.Hangfire" />
+		<!--#if (UseSqlServer) -->
+		<PackageReference Include="Hangfire.SqlServer" />
+		<!--#elif (UsePostgres) -->
+		<PackageReference Include="Hangfire.PostgreSql" />
+		<!--#elif (UseMySQL) -->
+		<PackageReference Include="Hangfire.MySqlStorage" />
+		<!--#endif -->
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ApiTemplate.ServiceDefaults\ApiTemplate.ServiceDefaults.csproj" />
+		<ProjectReference Include="..\ApiTemplate.Contracts\ApiTemplate.Contracts.csproj" />
+		<ProjectReference Include="..\ApiTemplate.Infrastructure\ApiTemplate.Infrastructure.csproj" />
+	</ItemGroup>
+
+</Project>

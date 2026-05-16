@@ -1,14 +1,20 @@
 using Viana.Results;
 using ApiTemplate.Application.Core.Entities;
-using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.UseCases.WeatherForecasts.GetAll;
-using MockQueryable.NSubstitute;
+using ApiTemplate.Tests.Application.Base;
 using NSubstitute;
 
 namespace ApiTemplate.Tests.Application.UseCases.WeatherForecasts;
 
-public class GetAllWeatherForecastHandlerTests
+public class GetAllWeatherForecastHandlerTests : TestBase
 {
+    private readonly GetAllWeatherForecastHandler _handler;
+
+    public GetAllWeatherForecastHandlerTests()
+    {
+        _handler = new GetAllWeatherForecastHandler(AppDbContextFactory);
+    }
+
     [Fact]
     public async Task ExecuteAsync_ShouldReturnAllForecasts()
     {
@@ -17,16 +23,10 @@ public class GetAllWeatherForecastHandlerTests
             new() { Id = Guid.NewGuid(), Date = DateOnly.FromDateTime(DateTime.UtcNow), TemperatureC = 10, Summary = "Cold" },
             new() { Id = Guid.NewGuid(), Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)), TemperatureC = 20, Summary = "Warm" }
         };
+        var dbSet = ToMockDbSet(list);
+        AppContext.WeatherForecasts.Returns(dbSet);
 
-        var dbSet = list.BuildMockDbSet();
-        var db = Substitute.For<IAppDbContext>();
-        db.WeatherForecasts.Returns(dbSet);
-
-        var factory = Substitute.For<IAppDbContextFactory>();
-        factory.Create().Returns(db);
-
-        var handler = new GetAllWeatherForecastHandler(factory);
-        var result = await handler.ExecuteAsync(new GetAllWeatherForecastRequest(), CancellationToken.None);
+        var result = await _handler.ExecuteAsync(new GetAllWeatherForecastRequest(), CancellationToken.None);
 
         var responses = Assert.IsType<ListResult<GetAllWeatherForecastResponse>>(result).Data;
         Assert.Equal(list.Count, responses.Count);

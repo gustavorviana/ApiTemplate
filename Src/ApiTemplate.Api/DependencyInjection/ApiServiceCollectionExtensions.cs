@@ -4,7 +4,7 @@ using Viana.Results.Mvc.Filters;
 
 namespace ApiTemplate.Api.DependencyInjection;
 
-public static class ApiServicesExtensions
+public static class ApiServiceCollectionExtensions
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {

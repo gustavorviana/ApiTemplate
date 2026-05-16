@@ -2,7 +2,7 @@ using Viana.Results;
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.UseCases.Auth.Register;
-using MockQueryable.NSubstitute;
+using ApiTemplate.Tests.Application.Base;
 using NSubstitute;
 #if (EnablePasswordSecurity)
 using ApiTemplate.Application.Core.Enums;
@@ -11,32 +11,32 @@ using ApiTemplate.Application.Core.ValueObjects;
 
 namespace ApiTemplate.Tests.Application.UseCases.Auth.Register;
 
-public class RegisterHandlerTests
+public class RegisterHandlerTests : TestBase
 {
+    private readonly IPasswordHasher _passwordHasher = Substitute.For<IPasswordHasher>();
 #if (EnablePasswordSecurity)
-    private static IPasswordSecurityProvider NewPasswordSecurity()
+    private readonly IPasswordSecurityProvider _passwordSecurity = Substitute.For<IPasswordSecurityProvider>();
+#endif
+    private readonly RegisterHandler _handler;
+
+    public RegisterHandlerTests()
     {
-        var provider = Substitute.For<IPasswordSecurityProvider>();
-        provider
+#if (EnablePasswordSecurity)
+        _passwordSecurity
             .Evaluate(Arg.Any<string>())
             .Returns(_ => new PasswordStrengthResult
             {
                 Strength = PasswordStrengthStatus.Strong,
                 MinimumRequired = PasswordStrengthStatus.Medium
             });
-        return provider;
-    }
 #endif
 
-    private static (IAppDbContextFactory factory, IAppDbContext db) NewFactory(IEnumerable<UserEntity>? users = null)
-    {
-        var dbSet = (users ?? new List<UserEntity>()).ToList().BuildMockDbSet();
-        var db = Substitute.For<IAppDbContext>();
-        db.Users.Returns(dbSet);
-
-        var factory = Substitute.For<IAppDbContextFactory>();
-        factory.Create().Returns(db);
-        return (factory, db);
+        _handler = new RegisterHandler(
+            AppDbContextFactory,
+#if (EnablePasswordSecurity)
+            _passwordSecurity,
+#endif
+            _passwordHasher);
     }
 
     [Fact]
@@ -49,53 +49,34 @@ public class RegisterHandlerTests
             Email = "user@example.com",
             PasswordHash = "hash"
         };
-        var (factory, db) = NewFactory(new[] { existing });
+        var dbSet = ToMockDbSet(new[] { existing });
+        AppContext.Users.Returns(dbSet);
 
-        var handler = new RegisterHandler(
-            factory,
-#if (EnablePasswordSecurity)
-            NewPasswordSecurity(),
-#endif
-            Substitute.For<IPasswordHasher>());
-
-        var result = await handler.ExecuteAsync(
+        var result = await _handler.ExecuteAsync(
             new RegisterRequest { Name = "New", Email = existing.Email, Password = "password" },
             CancellationToken.None);
 
         Assert.NotNull(Assert.IsType<Result<RegisterResponse>>(result).Problem);
-        await db.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await AppContext.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task ExecuteAsync_ShouldCreateUser_WhenEmailDoesNotExist()
     {
         var store = new List<UserEntity>();
-        var usersSet = store.BuildMockDbSet();
+        var usersSet = ToMockDbSet(store);
         usersSet
             .When(s => s.Add(Arg.Any<UserEntity>()))
             .Do(ci => store.Add(ci.Arg<UserEntity>()));
+        AppContext.Users.Returns(usersSet);
 
-        var db = Substitute.For<IAppDbContext>();
-        db.Users.Returns(usersSet);
+        _passwordHasher.Hash(Arg.Any<string>()).Returns("hashed-password");
 
-        var factory = Substitute.For<IAppDbContextFactory>();
-        factory.Create().Returns(db);
-
-        var passwordHasher = Substitute.For<IPasswordHasher>();
-        passwordHasher.Hash(Arg.Any<string>()).Returns("hashed-password");
-
-        var handler = new RegisterHandler(
-            factory,
-#if (EnablePasswordSecurity)
-            NewPasswordSecurity(),
-#endif
-            passwordHasher);
-
-        var result = await handler.ExecuteAsync(
+        var result = await _handler.ExecuteAsync(
             new RegisterRequest { Name = "New User", Email = "user@example.com", Password = "password" },
             CancellationToken.None);
 
-        await db.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await AppContext.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         Assert.Single(store);
         Assert.Equal("hashed-password", store[0].PasswordHash);
         Assert.IsType<Result<RegisterResponse>>(result);

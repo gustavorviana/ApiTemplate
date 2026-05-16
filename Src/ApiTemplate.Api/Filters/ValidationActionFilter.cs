@@ -1,4 +1,4 @@
-using ApiTemplate.Application.MessagesCatalog;
+using ApiTemplate.Application.Resources;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;

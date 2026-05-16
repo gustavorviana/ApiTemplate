@@ -1,4 +1,4 @@
-namespace ApiTemplate.Infrastructure.MessagesCatalog;
+namespace ApiTemplate.Infrastructure.Resources;
 
 public static partial class Messages
 {

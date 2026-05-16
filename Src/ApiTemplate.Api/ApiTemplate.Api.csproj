@@ -17,17 +17,28 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\ApiTemplate.ServiceDefaults\ApiTemplate.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\ApiTemplate.Application\ApiTemplate.Application.csproj" />
 		<ProjectReference Include="..\ApiTemplate.Infrastructure\ApiTemplate.Infrastructure.csproj" />
+		<!--#if (EnableHangfire) -->
+		<ProjectReference Include="..\ApiTemplate.Contracts\ApiTemplate.Contracts.csproj" />
+		<!--#endif -->
 	</ItemGroup>
 
+	<!--#if (EnableHangfire) -->
 	<ItemGroup>
-		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
-		<PackageReference Include="OpenTelemetry.Extensions.Hosting" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.Http" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
+		<PackageReference Include="ExecutionFlow.Hangfire.DependencyInjection" />
+		<!--#if (UseSqlServer) -->
+		<PackageReference Include="Hangfire.SqlServer" />
+		<!--#elif (UsePostgres) -->
+		<PackageReference Include="Hangfire.PostgreSql" />
+		<!--#elif (UseMySQL) -->
+		<PackageReference Include="Hangfire.MySqlStorage" />
+		<!--#endif -->
+	</ItemGroup>
+	<!--#endif -->
 
+	<ItemGroup>
 		<PackageReference Include="Viana.Results" />
 		<PackageReference Include="Viana.Results.Mvc" />
 		<!--#if (UseSwashbuckle) -->

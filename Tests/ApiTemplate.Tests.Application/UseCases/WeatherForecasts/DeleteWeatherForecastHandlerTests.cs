@@ -1,35 +1,31 @@
 using Viana.Results;
 using ApiTemplate.Application.Core.Entities;
-using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.UseCases.WeatherForecasts.Delete;
-using MockQueryable.NSubstitute;
+using ApiTemplate.Tests.Application.Base;
 using NSubstitute;
 
 namespace ApiTemplate.Tests.Application.UseCases.WeatherForecasts;
 
-public class DeleteWeatherForecastHandlerTests
+public class DeleteWeatherForecastHandlerTests : TestBase
 {
-    private static (IAppDbContextFactory factory, IAppDbContext db, Microsoft.EntityFrameworkCore.DbSet<WeatherForecastEntity> dbSet) NewFactory(IEnumerable<WeatherForecastEntity>? entities = null)
+    private readonly DeleteWeatherForecastHandler _handler;
+
+    public DeleteWeatherForecastHandlerTests()
     {
-        var dbSet = (entities ?? new List<WeatherForecastEntity>()).ToList().BuildMockDbSet();
-        var db = Substitute.For<IAppDbContext>();
-        db.WeatherForecasts.Returns(dbSet);
-
-        var factory = Substitute.For<IAppDbContextFactory>();
-        factory.Create().Returns(db);
-
-        return (factory, db, dbSet);
+        _handler = new DeleteWeatherForecastHandler(AppDbContextFactory);
     }
 
     [Fact]
     public async Task ExecuteAsync_ShouldReturnNotFound_WhenEntityDoesNotExist()
     {
-        var (factory, db, _) = NewFactory();
+        var dbSet = ToMockDbSet(Array.Empty<WeatherForecastEntity>());
+        AppContext.WeatherForecasts.Returns(dbSet);
 
-        var handler = new DeleteWeatherForecastHandler(factory);
-        var result = await handler.ExecuteAsync(new DeleteWeatherForecastRequest { Id = Guid.NewGuid() }, CancellationToken.None);
+        var result = await _handler.ExecuteAsync(
+            new DeleteWeatherForecastRequest { Id = Guid.NewGuid() },
+            CancellationToken.None);
 
-        await db.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await AppContext.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         Assert.IsType<Result>(result);
     }
 
@@ -43,13 +39,15 @@ public class DeleteWeatherForecastHandlerTests
             TemperatureC = 10,
             Summary = "Cold"
         };
-        var (factory, db, dbSet) = NewFactory(new[] { entity });
+        var dbSet = ToMockDbSet(new[] { entity });
+        AppContext.WeatherForecasts.Returns(dbSet);
 
-        var handler = new DeleteWeatherForecastHandler(factory);
-        var result = await handler.ExecuteAsync(new DeleteWeatherForecastRequest { Id = entity.Id }, CancellationToken.None);
+        var result = await _handler.ExecuteAsync(
+            new DeleteWeatherForecastRequest { Id = entity.Id },
+            CancellationToken.None);
 
         dbSet.Received(1).Remove(entity);
-        await db.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await AppContext.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         Assert.IsType<Result>(result);
     }
 }

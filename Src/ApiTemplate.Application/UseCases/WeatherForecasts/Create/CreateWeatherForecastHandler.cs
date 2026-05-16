@@ -1,11 +1,19 @@
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
+#if (EnableHangfire)
+using ApiTemplate.Contracts.Events;
+using ExecutionFlow.Abstractions;
+#endif
 using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases.WeatherForecasts.Create;
 
-public class CreateWeatherForecastHandler(IAppDbContextFactory dbFactory)
-    : IUseCaseHandler<CreateWeatherForecastRequest, Result<CreateWeatherForecastResponse>>
+public class CreateWeatherForecastHandler(
+    IAppDbContextFactory dbFactory
+#if (EnableHangfire)
+    , IEventDispatcher dispatcher
+#endif
+) : IUseCaseHandler<CreateWeatherForecastRequest, Result<CreateWeatherForecastResponse>>
 {
     public async Task<Result<CreateWeatherForecastResponse>> ExecuteAsync(
         CreateWeatherForecastRequest request,
@@ -23,6 +31,10 @@ public class CreateWeatherForecastHandler(IAppDbContextFactory dbFactory)
 
         db.WeatherForecasts.Add(entity);
         await db.SaveChangesAsync(cancellationToken);
+
+#if (EnableHangfire)
+        dispatcher.Publish(new WeatherForecastCreatedEvent(entity.Id, entity.Date, entity.TemperatureC, entity.Summary));
+#endif
 
         return new Result<CreateWeatherForecastResponse>(new CreateWeatherForecastResponse
         {

@@ -6,14 +6,18 @@ using ApiTemplate.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults()
-    .ConfigureOpenTelemetry()
-    .AddDefaultHealthChecks();
+builder.AddServiceDefaults();
 
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApiServices();
+builder.Services.AddCorsServices(builder.Configuration);
 
 #if (EnableJwt)
 builder.Services.AddJwtAuthentication(builder.Configuration);
+#endif
+
+#if (EnableHangfire)
+builder.Services.AddHangfireProducer(builder.Configuration);
 #endif
 
 #if (UseOpenApi)
@@ -36,6 +40,7 @@ app.MapDefaultEndpoints();
 app.UseOpenApiDocumentation();
 #endif
 app.UseHttpsRedirection();
+app.UseCors(CorsExtensions.DefaultPolicyName);
 
 #if (EnableJwt)
 app.UseJwtAuthentication();
@@ -48,3 +53,5 @@ app.UseCustomRateLimiting();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program;

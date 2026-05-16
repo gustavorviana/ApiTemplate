@@ -3,7 +3,7 @@ using ApiTemplate.Application.Core.Enums;
 using ApiTemplate.Application.Core.Options;
 using ApiTemplate.Application.Core.ValueObjects;
 using ApiTemplate.Application.Interfaces;
-using ApiTemplate.Infrastructure.MessagesCatalog;
+using ApiTemplate.Infrastructure.Resources;
 using Microsoft.Extensions.Options;
 
 namespace ApiTemplate.Infrastructure.Auth;

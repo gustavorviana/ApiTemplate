@@ -14,10 +14,33 @@ var db = builder
             .AddDatabase("DefaultConnection");
 #endif
 
-builder
+#if (EnableHangfire)
+var hangfireDb = builder
+#if (UseSqlServer)
+            .AddSqlServer("hangfire-sql")
+#elif (UsePostgres)
+            .AddPostgres("hangfire-pg")
+#elif (UseMySQL)
+            .AddMySql("hangfire-mysql")
+#endif
+            .AddDatabase("Hangfire");
+#endif
+
+var api = builder
     .AddProject<Projects.ApiTemplate_Api>("apitemplate")
     .WithReference(db, "DefaultConnection")
     .WaitFor(db);
+
+#if (EnableHangfire)
+api.WithReference(hangfireDb, "Hangfire").WaitFor(hangfireDb);
+
+builder
+    .AddProject<Projects.ApiTemplate_Jobs>("apitemplate-jobs")
+    .WithReference(db, "DefaultConnection")
+    .WaitFor(db)
+    .WithReference(hangfireDb, "Hangfire")
+    .WaitFor(hangfireDb);
+#endif
 
 builder
     .Build()

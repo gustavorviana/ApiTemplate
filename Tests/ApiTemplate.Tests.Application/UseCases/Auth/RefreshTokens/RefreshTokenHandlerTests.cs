@@ -3,33 +3,30 @@ using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Core.ValueObjects;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.UseCases.Auth.RefreshToken;
-using MockQueryable.NSubstitute;
+using ApiTemplate.Tests.Application.Base;
 using NSubstitute;
 
 namespace ApiTemplate.Tests.Application.UseCases.Auth.RefreshTokens;
 
-public class RefreshTokenHandlerTests
+public class RefreshTokenHandlerTests : TestBase
 {
-    private static IAppDbContextFactory NewFactory(IEnumerable<UserEntity>? users = null, IEnumerable<RefreshTokenEntity>? tokens = null)
-    {
-        var usersSet = (users ?? new List<UserEntity>()).ToList().BuildMockDbSet();
-        var tokensSet = (tokens ?? new List<RefreshTokenEntity>()).ToList().BuildMockDbSet();
-        var db = Substitute.For<IAppDbContext>();
-        db.Users.Returns(usersSet);
-        db.RefreshTokens.Returns(tokensSet);
+    private readonly IJwtService _jwtService = Substitute.For<IJwtService>();
+    private readonly RefreshTokenHandler _handler;
 
-        var factory = Substitute.For<IAppDbContextFactory>();
-        factory.Create().Returns(db);
-        return factory;
+    public RefreshTokenHandlerTests()
+    {
+        _handler = new RefreshTokenHandler(AppDbContextFactory, _jwtService);
     }
 
     [Fact]
     public async Task ExecuteAsync_ShouldReturnUnauthorized_WhenRefreshTokenDoesNotExist()
     {
-        var factory = NewFactory();
-        var handler = new RefreshTokenHandler(factory, Substitute.For<IJwtService>());
+        var usersDbSet = ToMockDbSet(Array.Empty<UserEntity>());
+        var tokensDbSet = ToMockDbSet(Array.Empty<RefreshTokenEntity>());
+        AppContext.Users.Returns(usersDbSet);
+        AppContext.RefreshTokens.Returns(tokensDbSet);
 
-        var result = await handler.ExecuteAsync(
+        var result = await _handler.ExecuteAsync(
             new RefreshTokenRequest { RefreshToken = "missing" },
             CancellationToken.None);
 
@@ -47,11 +44,12 @@ public class RefreshTokenHandlerTests
             ExpiresAt = DateTime.UtcNow.AddDays(1),
             IsRevoked = true
         };
+        var usersDbSet = ToMockDbSet(Array.Empty<UserEntity>());
+        var tokensDbSet = ToMockDbSet(new[] { revoked });
+        AppContext.Users.Returns(usersDbSet);
+        AppContext.RefreshTokens.Returns(tokensDbSet);
 
-        var factory = NewFactory(tokens: new[] { revoked });
-        var handler = new RefreshTokenHandler(factory, Substitute.For<IJwtService>());
-
-        var result = await handler.ExecuteAsync(
+        var result = await _handler.ExecuteAsync(
             new RefreshTokenRequest { RefreshToken = revoked.Token },
             CancellationToken.None);
 
@@ -68,7 +66,6 @@ public class RefreshTokenHandlerTests
             Email = "user@example.com",
             PasswordHash = "hash"
         };
-
         var storedToken = new RefreshTokenEntity
         {
             Id = Guid.NewGuid(),
@@ -76,12 +73,12 @@ public class RefreshTokenHandlerTests
             Token = "stored-refresh",
             ExpiresAt = DateTime.UtcNow.AddDays(1)
         };
+        var usersDbSet = ToMockDbSet(new[] { user });
+        var tokensDbSet = ToMockDbSet(new[] { storedToken });
+        AppContext.Users.Returns(usersDbSet);
+        AppContext.RefreshTokens.Returns(tokensDbSet);
 
-        var factory = NewFactory(users: new[] { user }, tokens: new[] { storedToken });
-
-        var jwtService = Substitute.For<IJwtService>();
-        jwtService.GenerateAccessToken(Arg.Any<JwtClaimsContext>()).Returns("new-access-token");
-
+        _jwtService.GenerateAccessToken(Arg.Any<JwtClaimsContext>()).Returns("new-access-token");
         var newRefreshToken = new RefreshTokenEntity
         {
             Id = Guid.NewGuid(),
@@ -89,11 +86,9 @@ public class RefreshTokenHandlerTests
             Token = "new-refresh-token",
             ExpiresAt = DateTime.UtcNow.AddDays(7)
         };
-        jwtService.GenerateRefreshToken(user.Id).Returns(newRefreshToken);
+        _jwtService.GenerateRefreshToken(user.Id).Returns(newRefreshToken);
 
-        var handler = new RefreshTokenHandler(factory, jwtService);
-
-        var result = await handler.ExecuteAsync(
+        var result = await _handler.ExecuteAsync(
             new RefreshTokenRequest { RefreshToken = storedToken.Token },
             CancellationToken.None);
 

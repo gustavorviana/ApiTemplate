@@ -5,8 +5,6 @@ namespace ApiTemplate.Api.Extensions;
 
 public static class RateLimitingExtensions
 {
-	private const string ConfigurationSectionName = "RateLimiting";
-
 	public const string LoginPolicyName = "LoginPolicy";
 	public const string AuthenticatedPolicyName = "AuthenticatedPolicy";
 	public const string AdminRoleName = "Admin";
@@ -14,8 +12,14 @@ public static class RateLimitingExtensions
 	public static TBuilder AddCustomRateLimiting<TBuilder>(this TBuilder builder)
 		where TBuilder : IHostApplicationBuilder
 	{
-		var options = new RateLimitingOptions();
-		builder.Configuration.GetSection(ConfigurationSectionName).Bind(options);
+		var section = builder.Configuration.GetSection(RateLimitingOptions.SectionName);
+
+		builder.Services.AddOptions<RateLimitingOptions>()
+			.Bind(section)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
+
+		var options = section.Get<RateLimitingOptions>() ?? new RateLimitingOptions();
 
 		if (!options.Enabled)
 		{
@@ -92,7 +96,7 @@ public static class RateLimitingExtensions
 	public static WebApplication UseCustomRateLimiting(this WebApplication app)
 	{
 		var enabled = app.Configuration
-			.GetSection(ConfigurationSectionName)
+			.GetSection(RateLimitingOptions.SectionName)
 			.GetValue<bool>("Enabled");
 
 		if (enabled)

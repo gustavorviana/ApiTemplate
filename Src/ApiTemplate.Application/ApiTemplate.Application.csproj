@@ -7,7 +7,6 @@
 	<ItemGroup>
 		<!--#if (!UseDomainProject) -->
 		<Folder Include="Core\Entities\" />
-		<Folder Include="Core\Events\" />
 		<Folder Include="Core\Enums\" />
 		<Folder Include="Core\ValueObjects\" />
 		<!--#endif -->
@@ -32,4 +31,10 @@
 	<ItemGroup>
 		<PackageReference Include="Viana.Results" />
 	</ItemGroup>
+	<!--#if (EnableHangfire) -->
+	<ItemGroup>
+		<PackageReference Include="ExecutionFlow" />
+		<ProjectReference Include="..\ApiTemplate.Contracts\ApiTemplate.Contracts.csproj" />
+	</ItemGroup>
+	<!--#endif -->
 </Project>

@@ -31,6 +31,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ApiTemplate.Api\ApiTemplate.Api.csproj" />
+    <!--#if (EnableHangfire) -->
+    <ProjectReference Include="..\ApiTemplate.Jobs\ApiTemplate.Jobs.csproj" />
+    <!--#endif -->
   </ItemGroup>
 
 </Project>

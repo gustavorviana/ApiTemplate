@@ -1,4 +1,4 @@
-using ApiTemplate.Application.MessagesCatalog;
+using ApiTemplate.Application.Resources;
 using FluentValidation;
 
 namespace ApiTemplate.Application.UseCases.Auth.Register;
