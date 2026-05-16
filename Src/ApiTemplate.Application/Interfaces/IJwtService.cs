@@ -1,11 +1,10 @@
 using ApiTemplate.Application.Core.Entities;
-using System.Security.Claims;
+using ApiTemplate.Application.Core.ValueObjects;
 
 namespace ApiTemplate.Application.Interfaces;
 
 public interface IJwtService
 {
-    string GenerateAccessToken(User user);
-    RefreshToken GenerateRefreshToken(Guid userId);
-    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+    string GenerateAccessToken(JwtClaimsContext claims);
+    RefreshTokenEntity GenerateRefreshToken(Guid userId);
 }

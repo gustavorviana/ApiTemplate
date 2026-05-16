@@ -1,9 +1,7 @@
 using ApiTemplate.Api.DependencyInjection;
+using ApiTemplate.Api.Filters;
 #if (EnableRateLimiting)
 using ApiTemplate.Api.Extensions;
-#endif
-#if (UseValidation)
-using ApiTemplate.Api.Filters;
 #endif
 using Viana.Results.Mvc;
 using Viana.Results.Mvc.Filters;
@@ -23,6 +21,9 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<VianaResultFilter>();
 }).AddVianaResultFilter();
 
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 #if (EnableJwt)
 builder.Services.AddJwtAuthentication(builder.Configuration);
 #endif
@@ -33,6 +34,8 @@ builder.AddCustomRateLimiting();
 #endif
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 #if (RunMigrationsOnStartup)
 await DatabaseMigrationRunner.RunMigrationsAsync(app.Services);

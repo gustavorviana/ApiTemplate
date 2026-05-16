@@ -59,12 +59,12 @@ public class WeatherForecastController : ControllerBase
     [EnableRateLimiting(RateLimitingExtensions.AuthenticatedPolicyName)]
 #endif
 #endif
-    [HttpDelete("{id:int}", Name = "DeleteWeatherForecast")]
+    [HttpDelete("{id:guid}", Name = "DeleteWeatherForecast")]
     public async Task<Result> Delete(
 #if (UseCqrs)
         [FromServices] DeleteWeatherForecastHandler handler,
 #endif
-        [FromRoute] int id,
+        [FromRoute] Guid id,
         CancellationToken token)
 #if (UseCqrs)
         => await handler.ExecuteAsync(new DeleteWeatherForecastRequest { Id = id }, token);

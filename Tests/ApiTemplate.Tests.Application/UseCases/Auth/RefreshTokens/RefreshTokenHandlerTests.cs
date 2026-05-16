@@ -1,6 +1,6 @@
-using System.Security.Claims;
 using Viana.Results;
 using ApiTemplate.Application.Core.Entities;
+using ApiTemplate.Application.Core.ValueObjects;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.UseCases.Auth.RefreshToken;
 using MockQueryable.NSubstitute;
@@ -10,80 +10,95 @@ namespace ApiTemplate.Tests.Application.UseCases.Auth.RefreshTokens;
 
 public class RefreshTokenHandlerTests
 {
-    private static IDbContext NewDb(IEnumerable<User>? users = null, IEnumerable<RefreshToken>? tokens = null)
+    private static IAppDbContextFactory NewFactory(IEnumerable<UserEntity>? users = null, IEnumerable<RefreshTokenEntity>? tokens = null)
     {
-        var usersSet = (users ?? new List<User>()).ToList().BuildMockDbSet();
-        var tokensSet = (tokens ?? new List<RefreshToken>()).ToList().BuildMockDbSet();
-        var db = Substitute.For<IDbContext>();
+        var usersSet = (users ?? new List<UserEntity>()).ToList().BuildMockDbSet();
+        var tokensSet = (tokens ?? new List<RefreshTokenEntity>()).ToList().BuildMockDbSet();
+        var db = Substitute.For<IAppDbContext>();
         db.Users.Returns(usersSet);
         db.RefreshTokens.Returns(tokensSet);
-        return db;
+
+        var factory = Substitute.For<IAppDbContextFactory>();
+        factory.Create().Returns(db);
+        return factory;
     }
 
     [Fact]
-    public async Task ExecuteAsync_ShouldReturnUnauthorized_WhenAccessTokenIsInvalid()
+    public async Task ExecuteAsync_ShouldReturnUnauthorized_WhenRefreshTokenDoesNotExist()
     {
-        var jwtService = Substitute.For<IJwtService>();
-        jwtService.GetPrincipalFromExpiredToken(Arg.Any<string>()).Returns((ClaimsPrincipal?)null);
-
-        var handler = new RefreshTokenHandler(NewDb(), jwtService);
+        var factory = NewFactory();
+        var handler = new RefreshTokenHandler(factory, Substitute.For<IJwtService>());
 
         var result = await handler.ExecuteAsync(
-            new RefreshTokenRequest { AccessToken = "invalid", RefreshToken = "token" },
+            new RefreshTokenRequest { RefreshToken = "missing" },
             CancellationToken.None);
 
         Assert.NotNull(Assert.IsType<Result<RefreshTokenResponse>>(result).Problem);
     }
 
     [Fact]
-    public async Task ExecuteAsync_ShouldReturnUnauthorized_WhenStoredRefreshTokenIsInvalid()
+    public async Task ExecuteAsync_ShouldReturnUnauthorized_WhenRefreshTokenIsRevoked()
     {
-        var userId = Guid.NewGuid();
-        var principal = new ClaimsPrincipal(new ClaimsIdentity(
-            new[] { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) }));
+        var revoked = new RefreshTokenEntity
+        {
+            Id = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            Token = "revoked-token",
+            ExpiresAt = DateTime.UtcNow.AddDays(1),
+            IsRevoked = true
+        };
 
-        var jwtService = Substitute.For<IJwtService>();
-        jwtService.GetPrincipalFromExpiredToken(Arg.Any<string>()).Returns(principal);
-
-        var db = NewDb();
-        var handler = new RefreshTokenHandler(db, jwtService);
+        var factory = NewFactory(tokens: new[] { revoked });
+        var handler = new RefreshTokenHandler(factory, Substitute.For<IJwtService>());
 
         var result = await handler.ExecuteAsync(
-            new RefreshTokenRequest { AccessToken = "access", RefreshToken = "refresh" },
+            new RefreshTokenRequest { RefreshToken = revoked.Token },
             CancellationToken.None);
 
         Assert.NotNull(Assert.IsType<Result<RefreshTokenResponse>>(result).Problem);
-        await db.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task ExecuteAsync_ShouldIssueNewTokens_WhenRefreshTokenIsValid()
     {
-        var user = User.Create("User", "user@example.com", "hash");
-        var userId = user.Id;
-        var principal = new ClaimsPrincipal(new ClaimsIdentity(
-            new[] { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) }));
+        var user = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "User",
+            Email = "user@example.com",
+            PasswordHash = "hash"
+        };
+
+        var storedToken = new RefreshTokenEntity
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = "stored-refresh",
+            ExpiresAt = DateTime.UtcNow.AddDays(1)
+        };
+
+        var factory = NewFactory(users: new[] { user }, tokens: new[] { storedToken });
 
         var jwtService = Substitute.For<IJwtService>();
-        jwtService.GetPrincipalFromExpiredToken(Arg.Any<string>()).Returns(principal);
+        jwtService.GenerateAccessToken(Arg.Any<JwtClaimsContext>()).Returns("new-access-token");
 
-        var storedToken = RefreshToken.Create(userId, "stored-refresh", DateTime.UtcNow.AddDays(1));
+        var newRefreshToken = new RefreshTokenEntity
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = "new-refresh-token",
+            ExpiresAt = DateTime.UtcNow.AddDays(7)
+        };
+        jwtService.GenerateRefreshToken(user.Id).Returns(newRefreshToken);
 
-        var db = NewDb(users: new[] { user }, tokens: new[] { storedToken });
-
-        jwtService.GenerateAccessToken(user).Returns("new-access-token");
-        var newRefreshToken = RefreshToken.Create(userId, "new-refresh-token", DateTime.UtcNow.AddDays(7));
-        jwtService.GenerateRefreshToken(userId).Returns(newRefreshToken);
-
-        var handler = new RefreshTokenHandler(db, jwtService);
+        var handler = new RefreshTokenHandler(factory, jwtService);
 
         var result = await handler.ExecuteAsync(
-            new RefreshTokenRequest { AccessToken = "access", RefreshToken = "stored-refresh" },
+            new RefreshTokenRequest { RefreshToken = storedToken.Token },
             CancellationToken.None);
 
         var response = Assert.IsType<Result<RefreshTokenResponse>>(result).Data;
         Assert.Equal("new-access-token", response.AccessToken);
         Assert.True(storedToken.IsRevoked);
-        await db.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

@@ -29,6 +29,8 @@ public static class ApiServiceCollectionExtensions
         });
 
 #if (EnableJwt)
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
         builder.Services.AddJwtServices(builder.Configuration);
 #endif
 
@@ -58,7 +60,7 @@ public static class ApiServiceCollectionExtensions
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<AppDbContext>(options =>
+        services.AddDbContextFactory<AppDbContext>(options =>
         {
 #if (UseSqlServer)
             options.UseSqlServer(connectionString);
@@ -69,7 +71,7 @@ public static class ApiServiceCollectionExtensions
 #endif
         });
 
-        services.AddScoped<IDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+        services.AddScoped<IAppDbContextFactory, AppDbContextFactory>();
 
         return services;
     }

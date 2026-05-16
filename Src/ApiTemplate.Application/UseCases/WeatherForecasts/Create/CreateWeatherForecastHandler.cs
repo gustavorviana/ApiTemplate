@@ -4,29 +4,34 @@ using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases.WeatherForecasts.Create;
 
-public class CreateWeatherForecastHandler(IDbContext db)
+public class CreateWeatherForecastHandler(IAppDbContextFactory dbFactory)
     : IUseCaseHandler<CreateWeatherForecastRequest, Result<CreateWeatherForecastResponse>>
 {
     public async Task<Result<CreateWeatherForecastResponse>> ExecuteAsync(
         CreateWeatherForecastRequest request,
         CancellationToken cancellationToken = default)
     {
-        var entity = WeatherForecast.Create(
-            DateOnly.FromDateTime(DateTime.UtcNow),
-            request.TemperatureC,
-            request.Summary);
+        await using var db = dbFactory.Create();
+
+        var entity = new WeatherForecastEntity
+        {
+            Id = Guid.NewGuid(),
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
+            TemperatureC = request.TemperatureC,
+            Summary = request.Summary
+        };
 
         db.WeatherForecasts.Add(entity);
         await db.SaveChangesAsync(cancellationToken);
 
-        var response = new CreateWeatherForecastResponse
+        return new Result<CreateWeatherForecastResponse>(new CreateWeatherForecastResponse
         {
             Id = entity.Id,
             Date = entity.Date,
             TemperatureC = entity.TemperatureC,
-            Summary = entity.Summary
-        };
-
-        return new Result<CreateWeatherForecastResponse>(response, 201);
+            Summary = entity.Summary,
+            CreatedAt = entity.CreatedAt,
+            CreatedByUserId = entity.CreatedByUserId
+        }, 201);
     }
 }

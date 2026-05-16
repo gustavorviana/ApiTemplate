@@ -1,9 +1,9 @@
 using ApiTemplate.Application.Core.Entities;
+using ApiTemplate.Application.Core.ValueObjects;
 using ApiTemplate.Application.Interfaces;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,72 +11,46 @@ namespace ApiTemplate.Infrastructure.Auth;
 
 public class JwtService(IOptions<JwtSettings> settings) : IJwtService
 {
+    private static readonly JsonWebTokenHandler Handler = new();
     private readonly JwtSettings _settings = settings.Value;
 
-    public string GenerateAccessToken(User user)
+    public string GenerateAccessToken(JwtClaimsContext claims)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var descriptor = new SecurityTokenDescriptor
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Name, user.Name),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            Issuer = _settings.Issuer,
+            Audience = _settings.Audience,
+            Expires = DateTime.UtcNow.AddMinutes(_settings.ExpirationMinutes),
+            IssuedAt = DateTime.UtcNow,
+            SigningCredentials = credentials,
+            Claims = new Dictionary<string, object>
+            {
+                [JwtRegisteredClaimNames.Sub] = claims.UserId.ToString(),
+                [JwtRegisteredClaimNames.Email] = claims.Email,
+                [JwtRegisteredClaimNames.Name] = claims.Name,
+                [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString()
+            }
         };
 
-        var token = new JwtSecurityToken(
-            issuer: _settings.Issuer,
-            audience: _settings.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_settings.ExpirationMinutes),
-            signingCredentials: credentials);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return Handler.CreateToken(descriptor);
     }
 
-    public RefreshToken GenerateRefreshToken(Guid userId)
+    public RefreshTokenEntity GenerateRefreshToken(Guid userId)
     {
         var tokenBytes = RandomNumberGenerator.GetBytes(64);
         var token = Convert.ToBase64String(tokenBytes);
         var expiresAt = DateTime.UtcNow.AddDays(_settings.RefreshTokenExpirationDays);
 
-        return RefreshToken.Create(userId, token, expiresAt);
-    }
-
-    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
-    {
-        var key = Encoding.UTF8.GetBytes(_settings.Secret);
-
-        var validationParameters = new TokenValidationParameters
+        return new RefreshTokenEntity
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
-            ValidateLifetime = false,
-            ValidIssuer = _settings.Issuer,
-            ValidAudience = _settings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(key)
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Token = token,
+            ExpiresAt = expiresAt,
+            IsRevoked = false
         };
-
-        var handler = new JwtSecurityTokenHandler();
-
-        try
-        {
-            var principal = handler.ValidateToken(token, validationParameters, out var securityToken);
-
-            if (securityToken is not JwtSecurityToken jwtToken ||
-                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return null;
-            }
-
-            return principal;
-        }
-        catch
-        {
-            return null;
-        }
     }
 }

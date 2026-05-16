@@ -12,17 +12,20 @@ public class GetAllWeatherForecastHandlerTests
     [Fact]
     public async Task ExecuteAsync_ShouldReturnAllForecasts()
     {
-        var list = new List<WeatherForecast>
+        var list = new List<WeatherForecastEntity>
         {
-            WeatherForecast.Create(DateOnly.FromDateTime(DateTime.UtcNow), 10, "Cold"),
-            WeatherForecast.Create(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)), 20, "Warm")
+            new() { Id = Guid.NewGuid(), Date = DateOnly.FromDateTime(DateTime.UtcNow), TemperatureC = 10, Summary = "Cold" },
+            new() { Id = Guid.NewGuid(), Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)), TemperatureC = 20, Summary = "Warm" }
         };
 
         var dbSet = list.BuildMockDbSet();
-        var db = Substitute.For<IDbContext>();
+        var db = Substitute.For<IAppDbContext>();
         db.WeatherForecasts.Returns(dbSet);
 
-        var handler = new GetAllWeatherForecastHandler(db);
+        var factory = Substitute.For<IAppDbContextFactory>();
+        factory.Create().Returns(db);
+
+        var handler = new GetAllWeatherForecastHandler(factory);
         var result = await handler.ExecuteAsync(new GetAllWeatherForecastRequest(), CancellationToken.None);
 
         var responses = Assert.IsType<ListResult<GetAllWeatherForecastResponse>>(result).Data;

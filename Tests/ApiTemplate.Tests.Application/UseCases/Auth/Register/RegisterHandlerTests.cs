@@ -28,16 +28,31 @@ public class RegisterHandlerTests
     }
 #endif
 
+    private static (IAppDbContextFactory factory, IAppDbContext db) NewFactory(IEnumerable<UserEntity>? users = null)
+    {
+        var dbSet = (users ?? new List<UserEntity>()).ToList().BuildMockDbSet();
+        var db = Substitute.For<IAppDbContext>();
+        db.Users.Returns(dbSet);
+
+        var factory = Substitute.For<IAppDbContextFactory>();
+        factory.Create().Returns(db);
+        return (factory, db);
+    }
+
     [Fact]
     public async Task ExecuteAsync_ShouldReturnConflict_WhenUserWithEmailAlreadyExists()
     {
-        var existing = User.Create("Existing", "user@example.com", "hash");
-        var usersSet = new List<User> { existing }.BuildMockDbSet();
-        var db = Substitute.For<IDbContext>();
-        db.Users.Returns(usersSet);
+        var existing = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "Existing",
+            Email = "user@example.com",
+            PasswordHash = "hash"
+        };
+        var (factory, db) = NewFactory(new[] { existing });
 
         var handler = new RegisterHandler(
-            db,
+            factory,
 #if (EnablePasswordSecurity)
             NewPasswordSecurity(),
 #endif
@@ -54,20 +69,23 @@ public class RegisterHandlerTests
     [Fact]
     public async Task ExecuteAsync_ShouldCreateUser_WhenEmailDoesNotExist()
     {
-        var store = new List<User>();
+        var store = new List<UserEntity>();
         var usersSet = store.BuildMockDbSet();
         usersSet
-            .When(s => s.Add(Arg.Any<User>()))
-            .Do(ci => store.Add(ci.Arg<User>()));
+            .When(s => s.Add(Arg.Any<UserEntity>()))
+            .Do(ci => store.Add(ci.Arg<UserEntity>()));
 
-        var db = Substitute.For<IDbContext>();
+        var db = Substitute.For<IAppDbContext>();
         db.Users.Returns(usersSet);
+
+        var factory = Substitute.For<IAppDbContextFactory>();
+        factory.Create().Returns(db);
 
         var passwordHasher = Substitute.For<IPasswordHasher>();
         passwordHasher.Hash(Arg.Any<string>()).Returns("hashed-password");
 
         var handler = new RegisterHandler(
-            db,
+            factory,
 #if (EnablePasswordSecurity)
             NewPasswordSecurity(),
 #endif

@@ -1,13 +1,13 @@
-using Viana.Results;
 using ApiTemplate.Application.Core.Entities;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.MessagesCatalog;
 using Microsoft.EntityFrameworkCore;
+using Viana.Results;
 
 namespace ApiTemplate.Application.UseCases.Auth.Register;
 
 public class RegisterHandler(
-    IDbContext db,
+    IAppDbContextFactory dbFactory,
 #if (EnablePasswordSecurity)
     IPasswordSecurityProvider passwordSecurityProvider,
 #endif
@@ -17,8 +17,11 @@ public class RegisterHandler(
         RegisterRequest request,
         CancellationToken cancellationToken = default)
     {
+        await using var db = dbFactory.Create();
+
+        var email = request.Email.Trim().ToLowerInvariant();
         var existing = await db.Users
-            .AnyAsync(u => u.Email == request.Email, cancellationToken);
+            .AnyAsync(u => u.Email == email, cancellationToken);
 
         if (existing)
             return new ProblemResult(409, Messages.Auth.UserWithEmailAlreadyExists);
@@ -37,18 +40,22 @@ public class RegisterHandler(
 #endif
 
         var passwordHash = passwordHasher.Hash(request.Password);
-        var user = User.Create(request.Name, request.Email, passwordHash);
+        var user = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = request.Name.Trim(),
+            Email = email,
+            PasswordHash = passwordHash
+        };
 
         db.Users.Add(user);
         await db.SaveChangesAsync(cancellationToken);
 
-        var response = new RegisterResponse
+        return new Result<RegisterResponse>(new RegisterResponse
         {
             Id = user.Id,
             Name = user.Name,
             Email = user.Email
-        };
-
-        return new Result<RegisterResponse>(response, 201);
+        }, 201);
     }
 }

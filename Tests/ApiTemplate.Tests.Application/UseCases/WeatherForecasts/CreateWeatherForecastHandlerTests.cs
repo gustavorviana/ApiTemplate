@@ -12,16 +12,19 @@ public class CreateWeatherForecastHandlerTests
     [Fact]
     public async Task ExecuteAsync_ShouldCreateWeatherForecast()
     {
-        var store = new List<WeatherForecast>();
+        var store = new List<WeatherForecastEntity>();
         var dbSet = store.BuildMockDbSet();
         dbSet
-            .When(s => s.Add(Arg.Any<WeatherForecast>()))
-            .Do(ci => store.Add(ci.Arg<WeatherForecast>()));
+            .When(s => s.Add(Arg.Any<WeatherForecastEntity>()))
+            .Do(ci => store.Add(ci.Arg<WeatherForecastEntity>()));
 
-        var db = Substitute.For<IDbContext>();
+        var db = Substitute.For<IAppDbContext>();
         db.WeatherForecasts.Returns(dbSet);
 
-        var handler = new CreateWeatherForecastHandler(db);
+        var factory = Substitute.For<IAppDbContextFactory>();
+        factory.Create().Returns(db);
+
+        var handler = new CreateWeatherForecastHandler(factory);
         var request = new CreateWeatherForecastRequest { TemperatureC = 10, Summary = "Cold" };
 
         var result = await handler.ExecuteAsync(request, CancellationToken.None);

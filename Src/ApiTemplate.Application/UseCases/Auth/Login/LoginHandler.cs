@@ -1,3 +1,4 @@
+using ApiTemplate.Application.Core.ValueObjects;
 using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.MessagesCatalog;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,7 @@ using Viana.Results;
 namespace ApiTemplate.Application.UseCases.Auth.Login;
 
 public class LoginHandler(
-    IDbContext db,
+    IAppDbContextFactory dbFactory,
     IJwtService jwtService,
     IPasswordHasher passwordHasher) : IUseCaseHandler<LoginRequest, Result<LoginResponse>>
 {
@@ -14,25 +15,26 @@ public class LoginHandler(
         LoginRequest request,
         CancellationToken cancellationToken = default)
     {
+        await using var db = dbFactory.Create();
+
+        var email = request.Email.Trim().ToLowerInvariant();
         var user = await db.Users
-            .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
         if (user is null || !passwordHasher.Verify(request.Password, user.PasswordHash))
             return new ProblemResult(401, Messages.Auth.InvalidEmailOrPassword);
 
-        var accessToken = jwtService.GenerateAccessToken(user);
+        var accessToken = jwtService.GenerateAccessToken(new JwtClaimsContext(user.Id, user.Name, user.Email));
         var refreshToken = jwtService.GenerateRefreshToken(user.Id);
 
         db.RefreshTokens.Add(refreshToken);
         await db.SaveChangesAsync(cancellationToken);
 
-        var response = new LoginResponse
+        return new Result<LoginResponse>(new LoginResponse
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
             ExpiresAt = refreshToken.ExpiresAt
-        };
-
-        return new Result<LoginResponse>(response);
+        });
     }
 }

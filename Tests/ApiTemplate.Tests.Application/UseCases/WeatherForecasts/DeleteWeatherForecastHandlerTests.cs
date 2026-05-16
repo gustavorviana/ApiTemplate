@@ -9,15 +9,25 @@ namespace ApiTemplate.Tests.Application.UseCases.WeatherForecasts;
 
 public class DeleteWeatherForecastHandlerTests
 {
+    private static (IAppDbContextFactory factory, IAppDbContext db, Microsoft.EntityFrameworkCore.DbSet<WeatherForecastEntity> dbSet) NewFactory(IEnumerable<WeatherForecastEntity>? entities = null)
+    {
+        var dbSet = (entities ?? new List<WeatherForecastEntity>()).ToList().BuildMockDbSet();
+        var db = Substitute.For<IAppDbContext>();
+        db.WeatherForecasts.Returns(dbSet);
+
+        var factory = Substitute.For<IAppDbContextFactory>();
+        factory.Create().Returns(db);
+
+        return (factory, db, dbSet);
+    }
+
     [Fact]
     public async Task ExecuteAsync_ShouldReturnNotFound_WhenEntityDoesNotExist()
     {
-        var dbSet = new List<WeatherForecast>().BuildMockDbSet();
-        var db = Substitute.For<IDbContext>();
-        db.WeatherForecasts.Returns(dbSet);
+        var (factory, db, _) = NewFactory();
 
-        var handler = new DeleteWeatherForecastHandler(db);
-        var result = await handler.ExecuteAsync(new DeleteWeatherForecastRequest { Id = 1 }, CancellationToken.None);
+        var handler = new DeleteWeatherForecastHandler(factory);
+        var result = await handler.ExecuteAsync(new DeleteWeatherForecastRequest { Id = Guid.NewGuid() }, CancellationToken.None);
 
         await db.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         Assert.IsType<Result>(result);
@@ -26,12 +36,16 @@ public class DeleteWeatherForecastHandlerTests
     [Fact]
     public async Task ExecuteAsync_ShouldDeleteEntity_WhenItExists()
     {
-        var entity = WeatherForecast.Create(DateOnly.FromDateTime(DateTime.UtcNow), 10, "Cold");
-        var dbSet = new List<WeatherForecast> { entity }.BuildMockDbSet();
-        var db = Substitute.For<IDbContext>();
-        db.WeatherForecasts.Returns(dbSet);
+        var entity = new WeatherForecastEntity
+        {
+            Id = Guid.NewGuid(),
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
+            TemperatureC = 10,
+            Summary = "Cold"
+        };
+        var (factory, db, dbSet) = NewFactory(new[] { entity });
 
-        var handler = new DeleteWeatherForecastHandler(db);
+        var handler = new DeleteWeatherForecastHandler(factory);
         var result = await handler.ExecuteAsync(new DeleteWeatherForecastRequest { Id = entity.Id }, CancellationToken.None);
 
         dbSet.Received(1).Remove(entity);
