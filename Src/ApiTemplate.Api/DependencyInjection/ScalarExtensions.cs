@@ -1,7 +1,7 @@
 #if (UseScalar)
 #if (EnableJwt)
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 #endif
 using Scalar.AspNetCore;
 using Viana.Results.OpenApi;
@@ -39,8 +39,8 @@ public static class ScalarExtensions
         public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
         {
             document.Components ??= new OpenApiComponents();
-            document.Components.SecuritySchemes ??= new Dictionary<string, OpenApiSecurityScheme>();
-            document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+            document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+            document.Components.SecuritySchemes["bearer"] = new OpenApiSecurityScheme
             {
                 Name = "Authorization",
                 Type = SecuritySchemeType.Http,
@@ -50,16 +50,11 @@ public static class ScalarExtensions
                 Description = "Enter your JWT token"
             };
 
-            var requirement = new OpenApiSecurityRequirement
+            document.Security ??= [];
+            document.Security.Add(new OpenApiSecurityRequirement
             {
-                [new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                }] = Array.Empty<string>()
-            };
-
-            document.SecurityRequirements ??= new List<OpenApiSecurityRequirement>();
-            document.SecurityRequirements.Add(requirement);
+                [new OpenApiSecuritySchemeReference("bearer", document)] = []
+            });
 
             return Task.CompletedTask;
         }
