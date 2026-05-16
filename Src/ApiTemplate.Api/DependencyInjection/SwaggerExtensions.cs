@@ -1,3 +1,4 @@
+#if (UseSwashbuckle)
 #if (EnableJwt)
 using ApiTemplate.Api.Filters;
 using Microsoft.OpenApi;
@@ -7,30 +8,31 @@ using Viana.Results.OpenApi.Swashbuckle;
 
 namespace ApiTemplate.Api.DependencyInjection;
 
-/// <summary>
-/// Swagger/OpenAPI configuration. Excluded when both Result and JWT are disabled.
-/// </summary>
 public static class SwaggerExtensions
 {
-	public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services)
-	{
-		services.AddEndpointsApiExplorer();
-		services.AddSwaggerGen(options =>
-		{
+    public static IServiceCollection AddOpenApiDocumentation(this IServiceCollection services)
+    {
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(options =>
+        {
             options.AddVianaResultFilters();
 #if (EnableJwt)
-			ConfigureJwtForSwagger(options);
-			options.OperationFilter<UnauthorizedAndForbiddenOperationFilter>();
+            ConfigureJwtForSwagger(options);
+            options.OperationFilter<UnauthorizedAndForbiddenOperationFilter>();
 #endif
         });
 
-		return services;
-	}
+        return services;
+    }
+
+    public static WebApplication UseOpenApiDocumentation(this WebApplication app)
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        return app;
+    }
 
 #if (EnableJwt)
-    /// <summary>
-    /// Configures Swagger for JWT Bearer authentication (security definition and requirement).
-    /// </summary>
     private static void ConfigureJwtForSwagger(SwaggerGenOptions options)
     {
         var bearerScheme = new OpenApiSecurityScheme
@@ -51,3 +53,4 @@ public static class SwaggerExtensions
     }
 #endif
 }
+#endif

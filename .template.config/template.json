@@ -80,6 +80,30 @@
       "defaultValue": "true",
       "description": "Enables rate limiting configuration and RateLimiting extensions."
     },
+    "OpenApiProvider": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "swashbuckle",
+      "description": "Chooses which library renders the OpenAPI document and UI.",
+      "choices": [
+        {
+          "choice": "swashbuckle",
+          "description": "Swashbuckle.AspNetCore + Viana.Results.OpenApi.Swashbuckle filters."
+        },
+        {
+          "choice": "scalar",
+          "description": "Microsoft.AspNetCore.OpenApi + Viana.Results.OpenApi transformers, UI rendered by Scalar.AspNetCore."
+        }
+      ]
+    },
+    "UseSwashbuckle": {
+      "type": "computed",
+      "value": "(OpenApiProvider == \"swashbuckle\")"
+    },
+    "UseScalar": {
+      "type": "computed",
+      "value": "(OpenApiProvider == \"scalar\")"
+    },
     "DbContextName": {
       "type": "parameter",
       "datatype": "string",
@@ -205,6 +229,19 @@
           "exclude": [
             "**/Src/ApiTemplate.Api/Extensions/RateLimitingExtensions.cs",
             "**/Src/ApiTemplate.Api/Configuration/RateLimitingOptions.cs"
+          ]
+        },
+        {
+          "condition": "(!UseSwashbuckle)",
+          "exclude": [
+            "**/Src/ApiTemplate.Api/DependencyInjection/SwaggerExtensions.cs",
+            "**/Src/ApiTemplate.Api/Filters/UnauthorizedAndForbiddenOperationFilter.cs"
+          ]
+        },
+        {
+          "condition": "(!UseScalar)",
+          "exclude": [
+            "**/Src/ApiTemplate.Api/DependencyInjection/ScalarExtensions.cs"
           ]
         },
         {

@@ -28,7 +28,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 #endif
 
-builder.Services.AddSwaggerDocumentation();
+builder.Services.AddOpenApiDocumentation();
 #if (EnableRateLimiting)
 builder.AddCustomRateLimiting();
 #endif
@@ -45,8 +45,7 @@ app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseOpenApiDocumentation();
 }
 
 app.UseHttpsRedirection();

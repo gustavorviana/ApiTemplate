@@ -14,9 +14,11 @@
     <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
   <ItemGroup>
-	  <PackageVersion Include="Viana.Results" Version="1.0.1" />
-	  <PackageVersion Include="Viana.Results.Mvc" Version="1.0.0" />
-	  <PackageVersion Include="Viana.Results.OpenApi.Swashbuckle" Version="1.0.0" />
+	  <PackageVersion Include="Viana.Results" Version="2.0.0" />
+	  <PackageVersion Include="Viana.Results.Mvc" Version="2.0.0" />
+	  <PackageVersion Include="Viana.Results.OpenApi" Version="1.0.0" />
+	  <PackageVersion Include="Viana.Results.OpenApi.Swashbuckle" Version="1.1.0" />
+	  <PackageVersion Include="Scalar.AspNetCore" Version="2.14.14" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.5.0" />

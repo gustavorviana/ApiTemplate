@@ -9,7 +9,9 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+		<!--#if (UseSwashbuckle) -->
 		<PackageReference Include="Swashbuckle.AspNetCore" />
+		<!--#endif -->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -26,7 +28,12 @@
 
 		<PackageReference Include="Viana.Results" />
 		<PackageReference Include="Viana.Results.Mvc" />
+		<!--#if (UseSwashbuckle) -->
 		<PackageReference Include="Viana.Results.OpenApi.Swashbuckle" />
+		<!--#else -->
+		<PackageReference Include="Viana.Results.OpenApi" />
+		<PackageReference Include="Scalar.AspNetCore" />
+		<!--#endif -->
 	</ItemGroup>
 
 </Project>
