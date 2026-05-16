@@ -1,4 +1,3 @@
-using ApiTemplate.Application.DependencyInjection;
 using ApiTemplate.Application.Interfaces;
 #if (EnableJwt)
 using ApiTemplate.Infrastructure.Auth;
@@ -13,11 +12,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ApiTemplate.Infrastructure.DependencyInjection;
 
+/// <summary>
+/// Registers host-agnostic infrastructure services (database, JWT issuer, password hashing).
+/// Nothing in this file should depend on the HTTP pipeline — services registered here
+/// must work identically in the API, background workers, migrations and integration tests.
+///
+/// HTTP-bound wiring (current user, request-scoped <c>IAppDbContextFactory</c>, use cases)
+/// lives in <c>ApiTemplate.Api.DependencyInjection.HttpApplicationExtensions</c>.
+/// </summary>
 public static class InfrastructureServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddApplication();
         services.AddDatabase(configuration.GetConnectionString("DefaultConnection")!);
 #if (EnableJwt)
         services.AddJwtServices(configuration);
@@ -75,7 +81,7 @@ public static class InfrastructureServiceCollectionExtensions
 #endif
         });
 
-        services.AddScoped<IAppDbContextFactory, AppDbContextFactory>();
+        services.AddScoped<ISystemDbContextFactory, SystemDbContextFactory>();
 
         services.AddHealthChecks()
             .AddDbContextCheck<AppDbContext>("database");

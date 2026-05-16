@@ -1,5 +1,3 @@
-using ApiTemplate.Application.Interfaces;
-using ApiTemplate.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -10,9 +8,6 @@ public static class JwtExtensions
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUser, HttpCurrentUser>();
-
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

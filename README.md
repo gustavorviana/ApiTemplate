@@ -98,7 +98,9 @@ flows into the audit logic above.
 - All entities inherit `EntityBase` → `Guid Id`, `DateTimeOffset CreatedAt`,
   `DateTimeOffset? UpdatedAt`.
 - Entities that need to track the acting user inherit `AuditableEntity` →
-  adds `Guid CreatedByUserId` (required) and `Guid? UpdatedByUserId` (optional).
+  adds `Guid? CreatedByUserId` and `Guid? UpdatedByUserId`. Both are nullable
+  because writes can originate from system-driven hosts (Hangfire workers,
+  migrations, seeds) where no user is in scope — `NULL` means "system action".
   `WeatherForecastEntity` is the bundled example.
 - Persistence types end with the `Entity` suffix; `AppDbContext.OnModelCreating`
   strips that suffix from the generated table names

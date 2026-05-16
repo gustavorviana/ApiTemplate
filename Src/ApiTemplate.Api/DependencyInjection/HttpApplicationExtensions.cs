@@ -1,22 +1,42 @@
+using ApiTemplate.Application.Interfaces;
 using ApiTemplate.Application.UseCases;
+using ApiTemplate.Infrastructure.Data;
+#if (EnableJwt)
+using ApiTemplate.Infrastructure.Auth;
+#endif
 #if (UseValidation)
 using FluentValidation;
 #endif
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace ApiTemplate.Application.DependencyInjection;
+namespace ApiTemplate.Api.DependencyInjection;
 
-public static class ApplicationServiceCollectionExtensions
+/// <summary>
+/// Registers application-layer services that are bound to the HTTP request pipeline.
+/// These services assume an active HTTP context (e.g. <c>ICurrentUser</c>) and must
+/// NOT be consumed by background workers, Hangfire handlers or other non-HTTP hosts.
+///
+/// Background hosts should depend on <see cref="ISystemDbContextFactory"/> and provide
+/// their own user-context abstraction populated from the job payload.
+/// </summary>
+public static class HttpApplicationExtensions
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddHttpApplication(this IServiceCollection services)
     {
-        var types = GetLoadableTypes(typeof(ApplicationServiceCollectionExtensions).Assembly);
+        var applicationAssembly = typeof(IUseCaseHandler<,>).Assembly;
+        var types = GetLoadableTypes(applicationAssembly);
 
         RegisterUseCases(services, types);
 #if (UseValidation)
         RegisterValidators(services, types);
 #endif
+
+#if (EnableJwt)
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUser, HttpCurrentUser>();
+#endif
+        services.AddScoped<IAppDbContextFactory, AppDbContextFactory>();
+
         return services;
     }
 
